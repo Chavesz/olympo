@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '../layouts/AppLayout.vue'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import PublicLayout from '../layouts/PublicLayout.vue'
+import ProfessionalLayout from '../layouts/ProfessionalLayout.vue'
 import StudentLayout from '../layouts/StudentLayout.vue'
 import { getRole, isAuthenticated } from '../services/auth'
 
@@ -26,6 +27,16 @@ import AlunoInscricoes from '../views/aluno/MinhasInscricoes.vue'
 import AlunoPerfil from '../views/aluno/MeuPerfil.vue'
 import AlunoPlano from '../views/aluno/MeuPlano.vue'
 import AlunoTreinos from '../views/aluno/MeusTreinos.vue'
+import ProfComunicados from '../views/profissional/Comunicados.vue'
+import ProfEvolucao from '../views/profissional/EvolucaoAlunos.vue'
+import ProfEventos from '../views/profissional/GerenciarEventos.vue'
+import ProfAulas from '../views/profissional/GerenciarAulas.vue'
+import ProfAlunos from '../views/profissional/GerenciarAlunos.vue'
+import ProfPlanos from '../views/profissional/GerenciarPlanos.vue'
+import ProfTreinos from '../views/profissional/GerenciarTreinos.vue'
+import ProfFichaAluno from '../views/profissional/FichaAluno.vue'
+import ProfInicio from '../views/profissional/Inicio.vue'
+import ProfInscricoes from '../views/profissional/Inscricoes.vue'
 
 const routes = [
   {
@@ -78,6 +89,23 @@ const routes = [
     ],
   },
   {
+    path: '/profissional',
+    component: ProfessionalLayout,
+    meta: { requiresAuth: true, roles: ['instrutor'] },
+    children: [
+      { path: '', name: 'profissional-inicio', component: ProfInicio },
+      { path: 'alunos', name: 'profissional-alunos', component: ProfAlunos },
+      { path: 'alunos/:id', name: 'profissional-ficha', component: ProfFichaAluno },
+      { path: 'treinos', name: 'profissional-treinos', component: ProfTreinos },
+      { path: 'evolucao', name: 'profissional-evolucao', component: ProfEvolucao },
+      { path: 'planos', name: 'profissional-planos', component: ProfPlanos },
+      { path: 'eventos', name: 'profissional-eventos', component: ProfEventos },
+      { path: 'aulas', name: 'profissional-aulas', component: ProfAulas },
+      { path: 'comunicados', name: 'profissional-comunicados', component: ProfComunicados },
+      { path: 'inscricoes', name: 'profissional-inscricoes', component: ProfInscricoes },
+    ],
+  },
+  {
     path: '/admin',
     component: AdminLayout,
     meta: { requiresAuth: true, roles: ['admin'] },
@@ -109,6 +137,7 @@ router.beforeEach((to) => {
     const role = getRole()
     if (role === 'admin') return { name: 'admin' }
     if (role === 'aluno') return { name: 'aluno-inicio' }
+    if (role === 'instrutor') return { name: 'profissional-inicio' }
     return { name: 'dashboard' }
   }
 
@@ -117,6 +146,7 @@ router.beforeEach((to) => {
     if (!role || !roles.includes(role)) {
       if (role === 'admin') return { name: 'admin' }
       if (role === 'aluno') return { name: 'aluno-inicio' }
+      if (role === 'instrutor') return { name: 'profissional-inicio' }
       return { name: 'dashboard' }
     }
   }

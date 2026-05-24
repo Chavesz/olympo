@@ -21,14 +21,26 @@ async function onLogout() {
 
         <nav class="flex items-center gap-3 text-sm">
           <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/">Home</router-link>
-          <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/dashboard">
+          <router-link
+            v-if="role === 'aluno'"
+            class="rounded px-2 py-1 hover:bg-slate-100"
+            to="/aluno"
+          >
+            Painel do Aluno
+          </router-link>
+          <router-link
+            v-if="role === 'instrutor'"
+            class="rounded px-2 py-1 hover:bg-slate-100"
+            to="/profissional"
+          >
+            Painel do Profissional
+          </router-link>
+          <router-link
+            v-if="role && role !== 'aluno' && role !== 'instrutor'"
+            class="rounded px-2 py-1 hover:bg-slate-100"
+            to="/dashboard"
+          >
             Dashboard
-          </router-link>
-          <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/meu-treino">
-            Meu Treino
-          </router-link>
-          <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/minhas-fichas">
-            Minhas Fichas
           </router-link>
           <router-link
             v-if="role === 'admin'"

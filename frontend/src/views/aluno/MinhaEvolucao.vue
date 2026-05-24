@@ -1,19 +1,30 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { getEmail } from '../../services/auth'
+import { loadAlunos } from '../../services/mockDb'
+import { loadEvaluations } from '../../services/evaluations'
 
-const medidas = ref([
-  { data: '2026-01-10', peso: 82.4, gordura: 18.2 },
-  { data: '2026-02-10', peso: 81.1, gordura: 17.6 },
-  { data: '2026-03-10', peso: 79.8, gordura: 16.9 },
-  { data: '2026-04-10', peso: 78.9, gordura: 16.3 },
-  { data: '2026-05-10', peso: 78.2, gordura: 15.9 },
-])
+const email = computed(() => getEmail())
+const aluno = computed(() => {
+  const normalized = String(email.value ?? '').toLowerCase()
+  return loadAlunos().find((a) => String(a.email).toLowerCase() === normalized) ?? null
+})
+
+const medidas = computed(() => {
+  if (!aluno.value) return []
+  const evals = loadEvaluations(aluno.value.id)
+  return evals
+    .slice()
+    .sort((a, b) => String(a.data).localeCompare(String(b.data)))
+    .map((e) => ({ data: e.data, peso: e.peso, gordura: e.gordura }))
+})
 
 const weights = computed(() => medidas.value.map((m) => m.peso))
 const minW = computed(() => Math.min(...weights.value))
 const maxW = computed(() => Math.max(...weights.value))
 
 const points = computed(() => {
+  if (medidas.value.length === 0) return ''
   const w = 260
   const h = 80
   const pad = 8
@@ -74,10 +85,12 @@ function fmtDate(value) {
               <td class="px-4 py-3 text-slate-700">{{ m.peso.toFixed(1) }} kg</td>
               <td class="px-4 py-3 text-slate-700">{{ m.gordura.toFixed(1) }}%</td>
             </tr>
+            <tr v-if="medidas.length === 0">
+              <td class="px-4 py-8 text-center text-sm text-slate-700" colspan="3">Sem avaliações registradas.</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </section>
 </template>
-

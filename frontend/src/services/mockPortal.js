@@ -145,3 +145,62 @@ export function saveSubscriptions(userId, subs) {
   localStorage.setItem(`${SUBS_PREFIX}${userId}`, JSON.stringify(subs))
 }
 
+export function listSubscriptionUserIds() {
+  const ids = []
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i)
+    if (!key) continue
+    if (!key.startsWith(SUBS_PREFIX)) continue
+    ids.push(key.slice(SUBS_PREFIX.length))
+  }
+  return ids
+}
+
+export function removeEventFromAllSubscriptions(eventId) {
+  const ids = listSubscriptionUserIds()
+  for (const userId of ids) {
+    const subs = loadSubscriptions(userId).filter((s) => !(s.type === 'evento' && s.id === eventId))
+    saveSubscriptions(userId, subs)
+  }
+}
+
+export function removeSlotFromAllSubscriptions(slotId) {
+  const ids = listSubscriptionUserIds()
+  for (const userId of ids) {
+    const subs = loadSubscriptions(userId).filter(
+      (s) => !(s.type === 'aula' && String(s.id).startsWith(`${slotId}|`)),
+    )
+    saveSubscriptions(userId, subs)
+  }
+}
+
+export function upsertEvento(evento) {
+  const eventos = loadEventos()
+  const idx = eventos.findIndex((e) => e.id === evento.id)
+  if (idx >= 0) eventos[idx] = evento
+  else eventos.unshift(evento)
+  saveEventos(eventos)
+  return eventos
+}
+
+export function deleteEvento(eventId) {
+  const eventos = loadEventos().filter((e) => e.id !== eventId)
+  saveEventos(eventos)
+  removeEventFromAllSubscriptions(eventId)
+  return eventos
+}
+
+export function upsertComunicado(comunicado) {
+  const comunicados = loadComunicados()
+  const idx = comunicados.findIndex((c) => c.id === comunicado.id)
+  if (idx >= 0) comunicados[idx] = comunicado
+  else comunicados.unshift(comunicado)
+  saveComunicados(comunicados)
+  return comunicados
+}
+
+export function deleteComunicado(comunicadoId) {
+  const comunicados = loadComunicados().filter((c) => c.id !== comunicadoId)
+  saveComunicados(comunicados)
+  return comunicados
+}

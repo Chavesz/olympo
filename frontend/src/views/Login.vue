@@ -24,6 +24,8 @@ const defaultRedirect = computed(() => {
   const normalizedEmail = email.value.trim().toLowerCase()
   const user = loadUsers().find((u) => String(u.email).toLowerCase() === normalizedEmail)
   if (user?.role === 'admin') return '/admin'
+  if (user?.role === 'aluno') return '/aluno'
+  if (user?.role === 'instrutor') return '/profissional'
   return '/dashboard'
 })
 
@@ -60,7 +62,8 @@ async function onSubmit() {
 
     setAuth({ token, role: user.role, email: user.email, userId: user.id })
 
-    const fallback = user.role === 'admin' ? '/admin' : user.role === 'aluno' ? '/aluno' : '/dashboard'
+    const fallback =
+      user.role === 'admin' ? '/admin' : user.role === 'aluno' ? '/aluno' : user.role === 'instrutor' ? '/profissional' : '/dashboard'
     await router.push(redirectTo.value || fallback)
   } catch {
     errorMessage.value = 'Usuário ou senha incorretos. Tente novamente.'
