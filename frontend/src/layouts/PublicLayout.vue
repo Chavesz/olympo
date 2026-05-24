@@ -16,7 +16,7 @@ const isLogin = computed(() => route.name === 'login')
           </div>
           <div class="leading-tight">
             <div class="text-sm font-semibold">Olympo</div>
-            <div class="text-[11px] text-slate-400">Academias</div>
+            <div class="text-[11px] text-slate-400">Gestão de academias</div>
           </div>
         </router-link>
 
@@ -52,7 +52,7 @@ const isLogin = computed(() => route.name === 'login')
               <div class="text-sm font-semibold">Olympo</div>
             </div>
             <p class="max-w-prose text-sm text-slate-300">
-              Ainda não é aluno? Faça sua inscrição presencialmente na recepção de uma de nossas unidades.
+              Acesso fornecido pelo administrador da sua academia. Solicite suas credenciais para entrar.
             </p>
           </div>
 
@@ -75,4 +75,3 @@ const isLogin = computed(() => route.name === 'login')
     </footer>
   </div>
 </template>
-

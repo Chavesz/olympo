@@ -21,63 +21,62 @@ const atividadesRecentes = computed(() => [
   <section class="space-y-6">
     <header class="space-y-1">
       <h1 class="text-2xl font-bold tracking-tight">Dashboard do Administrador</h1>
-      <p class="text-sm text-slate-300">Métricas e visão geral (dados mockados).</p>
+      <p class="text-sm text-slate-700">Métricas e visão geral (dados mockados).</p>
     </header>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-400">Total de Alunos</div>
-        <div class="mt-2 text-3xl font-bold text-slate-50">{{ totalAlunos }}</div>
-        <div class="mt-1 text-sm text-slate-300">Cadastrados no sistema</div>
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total de Alunos</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">{{ totalAlunos }}</div>
+        <div class="mt-1 text-sm text-slate-700">Cadastrados no sistema</div>
       </div>
 
-      <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-400">Instrutores Ativos</div>
-        <div class="mt-2 text-3xl font-bold text-slate-50">{{ instrutoresAtivos }}</div>
-        <div class="mt-1 text-sm text-slate-300">Com acesso ativo</div>
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Instrutores Ativos</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">{{ instrutoresAtivos }}</div>
+        <div class="mt-1 text-sm text-slate-700">Com acesso ativo</div>
       </div>
 
-      <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-400">Fichas Criadas</div>
-        <div class="mt-2 text-3xl font-bold text-slate-50">{{ fichasCriadas }}</div>
-        <div class="mt-1 text-sm text-slate-300">Total no período</div>
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fichas Criadas</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">{{ fichasCriadas }}</div>
+        <div class="mt-1 text-sm text-slate-700">Total no período</div>
       </div>
     </div>
 
     <div class="grid gap-4 lg:grid-cols-2">
-      <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
         <div class="flex items-center justify-between">
-          <div class="text-sm font-semibold text-slate-50">Atividades recentes</div>
-          <div class="text-xs text-slate-400">placeholder</div>
+          <div class="text-sm font-semibold text-slate-900">Atividades recentes</div>
+          <div class="text-xs text-slate-500">placeholder</div>
         </div>
 
-        <div class="mt-4 divide-y divide-slate-800">
+        <div class="mt-4 divide-y divide-slate-200">
           <div v-for="a in atividadesRecentes" :key="a.id" class="py-3">
             <div class="flex items-start justify-between gap-3">
               <div>
-                <div class="text-sm font-semibold text-slate-50">{{ a.titulo }}</div>
-                <div class="text-sm text-slate-300">{{ a.detalhe }}</div>
+                <div class="text-sm font-semibold text-slate-900">{{ a.titulo }}</div>
+                <div class="text-sm text-slate-700">{{ a.detalhe }}</div>
               </div>
-              <div class="text-xs text-slate-400">{{ a.quando }}</div>
+              <div class="text-xs text-slate-500">{{ a.quando }}</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="rounded-xl border border-slate-800 bg-slate-900 p-4">
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
         <div class="flex items-center justify-between">
-          <div class="text-sm font-semibold text-slate-50">Gráfico</div>
-          <div class="text-xs text-slate-400">placeholder</div>
+          <div class="text-sm font-semibold text-slate-900">Gráfico</div>
+          <div class="text-xs text-slate-500">placeholder</div>
         </div>
 
-        <div class="mt-4 grid h-56 place-items-center rounded-lg border border-dashed border-slate-700">
+        <div class="mt-4 grid h-56 place-items-center rounded-lg border border-dashed border-slate-300">
           <div class="text-center">
-            <div class="text-sm font-semibold text-slate-50">Área reservada</div>
-            <div class="mt-1 text-sm text-slate-300">Aqui entra um gráfico ou relatório.</div>
+            <div class="text-sm font-semibold text-slate-900">Área reservada</div>
+            <div class="mt-1 text-sm text-slate-700">Aqui entra um gráfico ou relatório.</div>
           </div>
         </div>
       </div>
     </div>
   </section>
 </template>
-

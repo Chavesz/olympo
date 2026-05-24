@@ -146,7 +146,7 @@ async function onSubmit() {
           </button>
 
           <p class="text-center text-xs text-slate-300">
-            Ainda não é aluno? Faça sua inscrição presencialmente na recepção de uma de nossas unidades.
+            Não tem acesso? Solicite suas credenciais ao administrador da sua academia.
           </p>
         </form>
       </div>

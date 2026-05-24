@@ -1,50 +1,53 @@
 <script setup>
 import hero from '../assets/hero.png'
 
-function scrollToUnidades() {
-  const el = document.getElementById('unidades')
+function scrollToPlanos() {
+  const el = document.getElementById('planos')
   if (!el) return
   el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-const services = [
-  { title: 'Musculação', desc: 'Área completa com equipamentos modernos.' },
-  { title: 'Aulas coletivas', desc: 'Spinning, funcional e muito mais.' },
-  { title: 'Acompanhamento', desc: 'Profissionais certificados ao seu lado.' },
-  { title: 'Nutrição', desc: 'Orientação para resultados sustentáveis.' },
+const modules = [
+  { title: 'Cadastros', desc: 'Gestão de alunos, instrutores e usuários com perfis.' },
+  { title: 'Treinos', desc: 'Criação de fichas e treinos por aluno, com histórico.' },
+  { title: 'Eventos e aulas', desc: 'Inscrições e controle de vagas em tempo real.' },
+  { title: 'Comunicados', desc: 'Publicações rápidas para toda a unidade.' },
 ]
 
-const diferenciais = [
-  'Equipamentos modernos e manutenção constante',
-  'Profissionais certificados e atendimento humanizado',
-  'Ambiente climatizado e higienização diária',
-  'Planos flexíveis e suporte ao aluno',
+const highlights = [
+  'Perfis de acesso: Administrador, Profissional e Aluno',
+  'CRUD completo com filtros, modais e validações',
+  'Fluxos conectados entre painéis (profissional → aluno)',
+  'Estrutura pronta para integração com JWT + API REST',
 ]
 
-const eventos = [
-  { title: 'Desafio 30 dias', date: '10/06', desc: 'Treinos guiados e metas semanais.', img: hero },
-  { title: 'Aulão aberto', date: '22/06', desc: 'Funcional e HIIT para todos os níveis.', img: hero },
-  { title: 'Semana da saúde', date: '01/07', desc: 'Palestras e avaliações físicas.', img: hero },
+const flow = [
+  { title: 'Admin configura', desc: 'Usuários, permissões e visão geral.' },
+  { title: 'Profissional gerencia', desc: 'Alunos, treinos, eventos, aulas e comunicados.' },
+  { title: 'Aluno acompanha', desc: 'Treinos, histórico, evolução, inscrições e avisos.' },
 ]
 
-const unidades = [
+const pricing = [
   {
-    id: 'u-1',
-    nome: 'Unidade Centro',
-    endereco: 'Av. Principal, 123 — Centro',
-    horario: 'Seg–Sex 06:00–22:00 • Sáb 08:00–14:00',
-    whatsapp: '(11) 90000-0000',
-    planos: ['Mensal: R$ 119,90', 'Anual: R$ 1.199,00'],
-    img: hero,
+    id: 'p-essencial',
+    name: 'Essencial',
+    price: 'R$ 199/mês',
+    badge: 'Para começar',
+    features: ['1 unidade', 'Cadastros + treinos', 'Eventos e comunicados'],
   },
   {
-    id: 'u-2',
-    nome: 'Unidade Norte',
-    endereco: 'Rua das Flores, 456 — Zona Norte',
-    horario: 'Seg–Sex 06:00–22:00 • Sáb 08:00–14:00',
-    whatsapp: '(11) 90000-0001',
-    planos: ['Mensal: R$ 129,90', 'Anual: R$ 1.299,00'],
-    img: hero,
+    id: 'p-pro',
+    name: 'Pro',
+    price: 'R$ 399/mês',
+    badge: 'Recomendado',
+    features: ['Até 3 unidades', 'Relatórios e métricas', 'Suporte prioritário'],
+  },
+  {
+    id: 'p-enterprise',
+    name: 'Enterprise',
+    price: 'Sob consulta',
+    badge: 'Escala',
+    features: ['Multiunidade', 'Integrações', 'SLA e suporte dedicado'],
   },
 ]
 </script>
@@ -61,7 +64,7 @@ const unidades = [
         <div class="mx-auto max-w-2xl text-center">
           <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">OLYMPOS</h1>
           <p class="mt-3 text-sm text-slate-200 sm:text-base">
-            Evolua seu corpo. Fortaleça sua mente. Treine com propósito.
+            Sistema web para gestão de academias, com painéis por perfil, CRUD e segurança.
           </p>
 
           <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -74,9 +77,9 @@ const unidades = [
             <button
               class="inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
               type="button"
-              @click="scrollToUnidades"
+              @click="scrollToPlanos"
             >
-              Conheça nossas unidades
+              Ver planos do sistema
             </button>
           </div>
         </div>
@@ -85,14 +88,14 @@ const unidades = [
 
     <section class="mx-auto max-w-6xl px-4 py-12">
       <header class="space-y-2">
-        <h2 class="text-2xl font-bold tracking-tight text-white">Serviços</h2>
-        <p class="text-sm text-slate-300">Tudo o que você precisa para treinar melhor.</p>
+        <h2 class="text-2xl font-bold tracking-tight text-white">Módulos do Olympo</h2>
+        <p class="text-sm text-slate-300">Base completa para gestão de academias.</p>
       </header>
 
       <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div
-          v-for="s in services"
-          :key="s.title"
+          v-for="m in modules"
+          :key="m.title"
           class="rounded-xl border border-slate-800 bg-slate-900 p-4"
         >
           <div class="flex items-center gap-2">
@@ -105,9 +108,9 @@ const unidades = [
                 />
               </svg>
             </div>
-            <div class="text-sm font-semibold text-white">{{ s.title }}</div>
+            <div class="text-sm font-semibold text-white">{{ m.title }}</div>
           </div>
-          <div class="mt-2 text-sm text-slate-300">{{ s.desc }}</div>
+          <div class="mt-2 text-sm text-slate-300">{{ m.desc }}</div>
         </div>
       </div>
     </section>
@@ -115,13 +118,13 @@ const unidades = [
     <section class="border-y border-slate-800 bg-slate-900/40">
       <div class="mx-auto grid max-w-6xl gap-6 px-4 py-12 lg:grid-cols-2 lg:items-center">
         <div class="overflow-hidden rounded-xl border border-slate-800 bg-slate-950">
-          <img :src="hero" alt="Academia" class="h-64 w-full object-cover opacity-90 lg:h-80" />
+          <img :src="hero" alt="Sistema Olympo" class="h-64 w-full object-cover opacity-90 lg:h-80" />
         </div>
 
         <div class="space-y-4">
-          <h2 class="text-2xl font-bold tracking-tight text-white">Qualidade e diferenciais</h2>
+          <h2 class="text-2xl font-bold tracking-tight text-white">Diferenciais</h2>
           <ul class="space-y-2 text-sm text-slate-300">
-            <li v-for="d in diferenciais" :key="d" class="flex items-start gap-2">
+            <li v-for="d in highlights" :key="d" class="flex items-start gap-2">
               <span class="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-200">
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -136,70 +139,61 @@ const unidades = [
 
     <section class="mx-auto max-w-6xl px-4 py-12">
       <header class="space-y-2">
-        <h2 class="text-2xl font-bold tracking-tight text-white">Eventos</h2>
-        <p class="text-sm text-slate-300">Programação informativa para nossos alunos.</p>
+        <h2 class="text-2xl font-bold tracking-tight text-white">Como o sistema se organiza</h2>
+        <p class="text-sm text-slate-300">Fluxo claro por perfil de acesso.</p>
       </header>
 
       <div class="mt-6 grid gap-4 md:grid-cols-3">
         <article
-          v-for="e in eventos"
-          :key="e.title"
+          v-for="c in flow"
+          :key="c.title"
           class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
         >
-          <img :src="e.img" alt="" class="h-36 w-full object-cover opacity-80" />
+          <img :src="hero" alt="" class="h-36 w-full object-cover opacity-80" />
           <div class="p-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-semibold text-white">{{ e.title }}</h3>
-              <span class="text-xs font-semibold text-emerald-200">{{ e.date }}</span>
-            </div>
-            <p class="mt-2 text-sm text-slate-300">{{ e.desc }}</p>
+            <h3 class="text-sm font-semibold text-white">{{ c.title }}</h3>
+            <p class="mt-2 text-sm text-slate-300">{{ c.desc }}</p>
           </div>
         </article>
       </div>
     </section>
 
-    <section id="unidades" class="mx-auto max-w-6xl px-4 py-12">
+    <section id="planos" class="mx-auto max-w-6xl px-4 py-12">
       <header class="space-y-2">
-        <h2 class="text-2xl font-bold tracking-tight text-white">Unidades</h2>
-        <p class="text-sm text-slate-300">Encontre a unidade mais próxima e escolha seu plano.</p>
+        <h2 class="text-2xl font-bold tracking-tight text-white">Planos</h2>
+        <p class="text-sm text-slate-300">Escolha o plano ideal para sua academia.</p>
       </header>
 
-      <div class="mt-6 space-y-4">
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
         <article
-          v-for="u in unidades"
-          :key="u.id"
-          class="grid overflow-hidden rounded-xl border border-slate-800 bg-slate-900 lg:grid-cols-3"
+          v-for="p in pricing"
+          :key="p.id"
+          class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900"
         >
-          <div class="lg:col-span-1">
-            <img :src="u.img" :alt="u.nome" class="h-48 w-full object-cover opacity-90 lg:h-full" />
-          </div>
-          <div class="space-y-3 p-4 lg:col-span-2">
-            <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-              <h3 class="text-lg font-semibold text-white">{{ u.nome }}</h3>
-              <span class="text-xs text-slate-400">Planos: {{ u.planos[0] }}</span>
+          <div class="p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-wide text-emerald-200">{{ p.badge }}</div>
+                <h3 class="mt-1 text-lg font-semibold text-white">{{ p.name }}</h3>
+              </div>
+              <div class="text-sm font-semibold text-slate-200">{{ p.price }}</div>
             </div>
 
-            <ul class="space-y-2 text-sm text-slate-300">
-              <li class="flex items-start gap-2">
+            <ul class="mt-4 space-y-2 text-sm text-slate-300">
+              <li v-for="f in p.features" :key="f" class="flex items-start gap-2">
                 <span class="mt-0.5 text-emerald-200">•</span>
-                <span><span class="font-semibold text-white">Endereço:</span> {{ u.endereco }}</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="mt-0.5 text-emerald-200">•</span>
-                <span><span class="font-semibold text-white">Horário:</span> {{ u.horario }}</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="mt-0.5 text-emerald-200">•</span>
-                <span><span class="font-semibold text-white">WhatsApp:</span> {{ u.whatsapp }}</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="mt-0.5 text-emerald-200">•</span>
-                <span class="space-y-1">
-                  <span class="block font-semibold text-white">Planos:</span>
-                  <span v-for="p in u.planos" :key="p" class="block">{{ p }}</span>
-                </span>
+                <span>{{ f }}</span>
               </li>
             </ul>
+
+            <div class="mt-5">
+              <router-link
+                class="inline-flex w-full items-center justify-center rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/15"
+                to="/login"
+              >
+                Acessar o sistema
+              </router-link>
+            </div>
           </div>
         </article>
       </div>
