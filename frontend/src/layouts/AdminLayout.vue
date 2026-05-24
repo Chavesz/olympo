@@ -27,6 +27,13 @@ async function onLogout() {
           <router-link class="rounded px-2 py-1 hover:bg-slate-900" to="/admin/usuarios">
             Usuários
           </router-link>
+          <router-link class="rounded px-2 py-1 hover:bg-slate-900" to="/admin/alunos">Alunos</router-link>
+          <router-link class="rounded px-2 py-1 hover:bg-slate-900" to="/admin/instrutores">
+            Instrutores
+          </router-link>
+          <router-link class="rounded px-2 py-1 hover:bg-slate-900" to="/admin/fichas">
+            Fichas
+          </router-link>
         </nav>
 
         <button

@@ -10,7 +10,10 @@ import Dashboard from '../views/Dashboard.vue'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import AdminDashboardV2 from '../views/admin/Dashboard.vue'
+import Alunos from '../views/admin/Alunos.vue'
+import FichasTreino from '../views/admin/FichasTreino.vue'
 import GerenciarUsuarios from '../views/admin/GerenciarUsuarios.vue'
+import Instrutores from '../views/admin/Instrutores.vue'
 import MeuTreino from '../views/user/MeuTreino.vue'
 
 const routes = [
@@ -48,6 +51,9 @@ const routes = [
     children: [
       { path: '', name: 'admin', component: AdminDashboardV2 },
       { path: 'usuarios', name: 'admin-usuarios', component: GerenciarUsuarios },
+      { path: 'alunos', name: 'admin-alunos', component: Alunos },
+      { path: 'instrutores', name: 'admin-instrutores', component: Instrutores },
+      { path: 'fichas', name: 'admin-fichas', component: FichasTreino },
     ],
   },
 ]
