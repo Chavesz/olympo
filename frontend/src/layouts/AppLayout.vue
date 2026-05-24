@@ -27,6 +27,9 @@ async function onLogout() {
           <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/meu-treino">
             Meu Treino
           </router-link>
+          <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/minhas-fichas">
+            Minhas Fichas
+          </router-link>
           <router-link
             v-if="role === 'admin'"
             class="rounded px-2 py-1 hover:bg-slate-100"

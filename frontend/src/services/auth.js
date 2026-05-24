@@ -22,6 +22,16 @@ export function getRole() {
   return auth?.role ?? null
 }
 
+export function getUserId() {
+  const auth = getAuth()
+  return auth?.userId ?? null
+}
+
+export function getEmail() {
+  const auth = getAuth()
+  return auth?.email ?? null
+}
+
 export function setAuth(auth) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(auth))
 }
