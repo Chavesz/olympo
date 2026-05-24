@@ -31,6 +31,7 @@ const initials = computed(() => {
 const links = [
   { label: 'Início', to: '/profissional' },
   { label: 'Gerenciar Alunos', to: '/profissional/alunos' },
+  { label: 'Ficha do Aluno', to: '/profissional/alunos' },
   { label: 'Gerenciar Treinos', to: '/profissional/treinos' },
   { label: 'Evolução dos Alunos', to: '/profissional/evolucao' },
   { label: 'Gerenciar Planos', to: '/profissional/planos' },
@@ -172,4 +173,3 @@ async function logout() {
     </teleport>
   </div>
 </template>
-
