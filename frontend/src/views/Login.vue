@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { setAuth } from '../services/auth'
 
 const router = useRouter()
 
@@ -13,6 +14,9 @@ async function onSubmit() {
   isSubmitting.value = true
 
   try {
+    const role = email.value.toLowerCase().includes('admin') ? 'admin' : 'user'
+    setAuth({ token: 'dev-token', role })
+
     await router.push('/dashboard')
   } finally {
     isSubmitting.value = false
@@ -57,6 +61,11 @@ async function onSubmit() {
       >
         Entrar
       </button>
+
+      <div class="rounded border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+        <div class="font-semibold text-slate-900">Modo dev</div>
+        <div>Use um e-mail contendo “admin” para entrar como administrador.</div>
+      </div>
     </form>
   </section>
 </template>

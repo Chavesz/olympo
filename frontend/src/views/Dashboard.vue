@@ -23,5 +23,10 @@
         <div class="mt-1 text-sm text-slate-700">CRUD de fichas.</div>
       </div>
     </div>
+
+    <div class="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
+      <div class="font-semibold text-slate-900">Dica</div>
+      <div>Para abrir a área Admin, faça login com e-mail contendo “admin”.</div>
+    </div>
   </section>
 </template>
