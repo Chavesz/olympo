@@ -60,7 +60,8 @@ async function onSubmit() {
 
     setAuth({ token, role: user.role, email: user.email, userId: user.id })
 
-    await router.push(redirectTo.value || (user.role === 'admin' ? '/admin' : '/dashboard'))
+    const fallback = user.role === 'admin' ? '/admin' : user.role === 'aluno' ? '/aluno' : '/dashboard'
+    await router.push(redirectTo.value || fallback)
   } catch {
     errorMessage.value = 'Usuário ou senha incorretos. Tente novamente.'
   } finally {

@@ -11,9 +11,36 @@ const seedUsers = [
 ]
 
 const seedAlunos = [
-  { id: 'a-1', nome: 'Jonh Santos', email: 'jonh@olympo.dev', telefone: '(11) 90000-0001', status: 'ativo' },
-  { id: 'a-2', nome: 'Kauã Chaves', email: 'kaua@olympo.dev', telefone: '(11) 90000-0002', status: 'inativo' },
-  { id: 'a-3', nome: 'Maria Oliveira', email: 'maria@olympo.dev', telefone: '(11) 90000-0003', status: 'ativo' },
+  {
+    id: 'a-1',
+    nome: 'Jonh Santos',
+    email: 'jonh@olympo.dev',
+    telefone: '(11) 90000-0001',
+    dataNascimento: '2001-04-12',
+    dataMatricula: '2025-02-03',
+    planoAtivo: 'Mensal',
+    status: 'ativo',
+  },
+  {
+    id: 'a-2',
+    nome: 'Kauã Chaves',
+    email: 'kaua@olympo.dev',
+    telefone: '(11) 90000-0002',
+    dataNascimento: '2002-09-20',
+    dataMatricula: '2024-10-15',
+    planoAtivo: 'Anual',
+    status: 'inativo',
+  },
+  {
+    id: 'a-3',
+    nome: 'Maria Oliveira',
+    email: 'maria@olympo.dev',
+    telefone: '(11) 90000-0003',
+    dataNascimento: '1999-12-05',
+    dataMatricula: '2025-06-01',
+    planoAtivo: 'Mensal',
+    status: 'ativo',
+  },
 ]
 
 const seedInstrutores = [

@@ -1,0 +1,60 @@
+<script setup>
+import { computed } from 'vue'
+import { getEmail } from '../../services/auth'
+import { loadAlunos } from '../../services/mockDb'
+
+const email = computed(() => getEmail())
+
+const aluno = computed(() => {
+  const normalizedEmail = String(email.value ?? '').toLowerCase()
+  return loadAlunos().find((a) => String(a.email).toLowerCase() === normalizedEmail) ?? null
+})
+
+function fmtDate(value) {
+  if (!value) return '-'
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(d)
+}
+</script>
+
+<template>
+  <section class="space-y-6">
+    <header class="space-y-1">
+      <h1 class="text-2xl font-bold tracking-tight">Meu perfil</h1>
+      <p class="text-sm text-slate-700">Dados somente leitura. Alterações são feitas presencialmente.</p>
+    </header>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-4">
+      <div class="flex items-center gap-4">
+        <div class="grid h-14 w-14 place-items-center rounded-full bg-slate-900 text-sm font-extrabold text-white">
+          {{ (aluno?.nome ?? 'A').slice(0, 1).toUpperCase() }}
+        </div>
+        <div>
+          <div class="text-lg font-semibold text-slate-900">{{ aluno?.nome ?? 'Aluno' }}</div>
+          <div class="text-sm text-slate-700">{{ aluno?.email ?? email }}</div>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-3 sm:grid-cols-2">
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Telefone</div>
+          <div class="mt-1 text-sm font-semibold text-slate-900">{{ aluno?.telefone ?? '-' }}</div>
+        </div>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Nascimento</div>
+          <div class="mt-1 text-sm font-semibold text-slate-900">{{ fmtDate(aluno?.dataNascimento) }}</div>
+        </div>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Matrícula</div>
+          <div class="mt-1 text-sm font-semibold text-slate-900">{{ fmtDate(aluno?.dataMatricula) }}</div>
+        </div>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Plano ativo</div>
+          <div class="mt-1 text-sm font-semibold text-slate-900">{{ aluno?.planoAtivo ?? '-' }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
