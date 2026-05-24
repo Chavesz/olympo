@@ -24,6 +24,9 @@ async function onLogout() {
           <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/dashboard">
             Dashboard
           </router-link>
+          <router-link class="rounded px-2 py-1 hover:bg-slate-100" to="/meu-treino">
+            Meu Treino
+          </router-link>
           <router-link
             v-if="role === 'admin'"
             class="rounded px-2 py-1 hover:bg-slate-100"
@@ -35,6 +38,13 @@ async function onLogout() {
 
         <div class="flex items-center gap-2">
           <span v-if="authed" class="text-xs text-slate-600">Perfil: {{ role }}</span>
+          <router-link
+            v-if="!authed"
+            class="rounded border border-slate-300 bg-white px-3 py-1 text-sm font-semibold hover:bg-slate-50"
+            to="/login"
+          >
+            Entrar
+          </router-link>
           <button
             v-if="authed"
             class="rounded border border-slate-300 bg-white px-3 py-1 text-sm font-semibold hover:bg-slate-50"

@@ -5,10 +5,13 @@ import AuthLayout from '../layouts/AuthLayout.vue'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import { getRole, isAuthenticated } from '../services/auth'
 
-import AdminDashboard from '../views/AdminDashboard.vue'
+import Cadastro from '../views/Cadastro.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+import AdminDashboardV2 from '../views/admin/Dashboard.vue'
+import GerenciarUsuarios from '../views/admin/GerenciarUsuarios.vue'
+import MeuTreino from '../views/user/MeuTreino.vue'
 
 const routes = [
   {
@@ -22,18 +25,30 @@ const routes = [
         component: Dashboard,
         meta: { requiresAuth: true, roles: ['admin', 'user'] },
       },
+      {
+        path: 'meu-treino',
+        name: 'meu-treino',
+        component: MeuTreino,
+        meta: { requiresAuth: true, roles: ['admin', 'user'] },
+      },
     ],
   },
   {
     path: '/',
     component: AuthLayout,
-    children: [{ path: 'login', name: 'login', component: Login, meta: { guestOnly: true } }],
+    children: [
+      { path: 'login', name: 'login', component: Login, meta: { guestOnly: true } },
+      { path: 'cadastro', name: 'cadastro', component: Cadastro, meta: { guestOnly: true } },
+    ],
   },
   {
     path: '/admin',
     component: AdminLayout,
     meta: { requiresAuth: true, roles: ['admin'] },
-    children: [{ path: '', name: 'admin', component: AdminDashboard }],
+    children: [
+      { path: '', name: 'admin', component: AdminDashboardV2 },
+      { path: 'usuarios', name: 'admin-usuarios', component: GerenciarUsuarios },
+    ],
   },
 ]
 

@@ -22,11 +22,10 @@ export function getRole() {
   return auth?.role ?? null
 }
 
-export function setAuth({ token, role }) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ token, role }))
+export function setAuth(auth) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(auth))
 }
 
 export function clearAuth() {
   localStorage.removeItem(STORAGE_KEY)
 }
-
