@@ -58,42 +58,23 @@ async function onSubmit() {
 </script>
 
 <template>
-  <section class="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-2 lg:items-center">
-    <div class="space-y-5">
-      <div class="flex items-center gap-3">
-        <div
-          class="grid h-11 w-11 place-items-center rounded-xl bg-slate-900 text-sm font-extrabold text-white"
-        >
+  <section class="mx-auto flex min-h-[72vh] w-full items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md space-y-6">
+      <div class="text-center">
+        <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-slate-900 text-sm font-extrabold text-white">
           O
         </div>
-        <div>
-          <div class="text-sm font-semibold text-slate-600">Olympo</div>
-          <div class="text-xs text-slate-500">Gestão de Academias</div>
-        </div>
+        <div class="mt-3 text-sm font-semibold text-slate-700">Olympo</div>
+        <div class="text-xs text-slate-500">Gestão de Academias</div>
       </div>
 
-      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">Bem-vindo de volta</h1>
-      <p class="max-w-prose text-sm text-slate-700">
-        Entre para acessar seu painel. O acesso é controlado por perfil (admin/usuário) e será integrado ao
-        JWT no back-end.
-      </p>
-
-      <div class="rounded-lg border border-slate-200 bg-white p-4 text-sm text-slate-700">
-        <div class="font-semibold text-slate-900">Acesso seguro</div>
-        <div class="mt-1">
-          Rotas protegidas bloqueiam acesso sem login. Admin tem rotas e layout dedicados.
-        </div>
-      </div>
-    </div>
-
-    <div class="lg:justify-self-end">
       <form
-        class="w-full max-w-md space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+        class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
         @submit.prevent="onSubmit"
       >
-        <header class="space-y-1">
-          <h2 class="text-xl font-bold tracking-tight text-slate-900">Login</h2>
-          <p class="text-sm text-slate-600">Use suas credenciais para continuar.</p>
+        <header class="space-y-1 text-center">
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900">Entrar</h1>
+          <p class="text-sm text-slate-600">Acesse seu painel com segurança.</p>
         </header>
 
         <div
@@ -191,6 +172,10 @@ async function onSubmit() {
           <div class="mt-1">Redirect após login: <span class="font-semibold">{{ redirectTo }}</span></div>
         </div>
       </form>
+
+      <div class="text-center text-xs text-slate-500">
+        <span class="font-semibold text-slate-700">Olympo</span> • acesso por perfil • rotas protegidas
+      </div>
     </div>
   </section>
 </template>
