@@ -1,97 +1,102 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { setAuth } from '../services/auth'
-import { loadUsers } from '../services/mockDb'
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { setAuth } from "../services/auth";
+import { api } from "../services/api";
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const email = ref('')
-const senha = ref('')
-const showSenha = ref(false)
-const isSubmitting = ref(false)
-const errorMessage = ref('')
-const hasError = computed(() => Boolean(errorMessage.value))
+const email = ref("");
+const senha = ref("");
+const showSenha = ref(false);
+const isSubmitting = ref(false);
+const errorMessage = ref("");
+const hasError = computed(() => Boolean(errorMessage.value));
 
 const redirectTo = computed(() => {
-  const raw = route.query.redirect
-  if (typeof raw === 'string' && raw.startsWith('/')) return raw
-  return ''
-})
-
-const defaultRedirect = computed(() => {
-  const normalizedEmail = email.value.trim().toLowerCase()
-  const user = loadUsers().find((u) => String(u.email).toLowerCase() === normalizedEmail)
-  if (user?.role === 'admin') return '/admin'
-  if (user?.role === 'aluno') return '/aluno'
-  if (user?.role === 'instrutor') return '/profissional'
-  return '/dashboard'
-})
+  const raw = route.query.redirect;
+  if (typeof raw === "string" && raw.startsWith("/")) return raw;
+  return "";
+});
 
 function validate() {
-  const normalizedEmail = email.value.trim().toLowerCase()
-  if (!normalizedEmail) return 'Informe seu e-mail.'
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) return 'Informe um e-mail válido.'
-  if (!senha.value) return 'Informe sua senha.'
-  if (senha.value.length < 6) return 'A senha deve ter pelo menos 6 caracteres.'
-  return ''
+  const normalizedEmail = email.value.trim().toLowerCase();
+  if (!normalizedEmail) return "Informe seu e-mail.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail))
+    return "Informe um e-mail válido.";
+  if (!senha.value) return "Informe sua senha.";
+  if (senha.value.length < 6)
+    return "A senha deve ter pelo menos 6 caracteres.";
+  return "";
 }
 
 async function onSubmit() {
-  if (isSubmitting.value) return
-  isSubmitting.value = true
+  if (isSubmitting.value) return;
+  isSubmitting.value = true;
 
   try {
-    errorMessage.value = ''
-    const validationError = validate()
+    errorMessage.value = "";
+    const validationError = validate();
     if (validationError) {
-      errorMessage.value = validationError
-      return
+      errorMessage.value = validationError;
+      return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 450))
+    const { token, user } = await api.post("/auth/login", {
+      email: email.value.trim().toLowerCase(),
+      senha: senha.value,
+    });
 
-    const token = 'dev-token'
-    const normalizedEmail = email.value.trim().toLowerCase()
-    const user = loadUsers().find((u) => String(u.email).toLowerCase() === normalizedEmail)
-    if (!user) {
-      errorMessage.value = 'Usuário ou senha incorretos. Tente novamente.'
-      return
-    }
-
-    setAuth({ token, role: user.role, email: user.email, userId: user.id })
+    setAuth({ token, role: user.role, email: user.email, userId: user.id });
 
     const fallback =
-      user.role === 'admin' ? '/admin' : user.role === 'aluno' ? '/aluno' : user.role === 'instrutor' ? '/profissional' : '/dashboard'
-    await router.push(redirectTo.value || fallback)
-  } catch {
-    errorMessage.value = 'Usuário ou senha incorretos. Tente novamente.'
+      user.role === "admin"
+        ? "/admin"
+        : user.role === "aluno"
+          ? "/aluno"
+          : user.role === "instrutor"
+            ? "/profissional"
+            : "/dashboard";
+    await router.push(redirectTo.value || fallback);
+  } catch (err) {
+    errorMessage.value =
+      err.message || "Usuário ou senha incorretos. Tente novamente.";
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
 }
 </script>
 
 <template>
-  <section class="mx-auto flex min-h-[72vh] w-full items-center justify-center px-4 py-12">
+  <section
+    class="mx-auto flex min-h-[72vh] w-full items-center justify-center px-4 py-12"
+  >
     <div class="w-full max-w-md">
-      <div class="rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-xl shadow-black/30 sm:p-7">
+      <div
+        class="rounded-2xl border border-slate-800 bg-slate-950 p-6 shadow-xl shadow-black/30 sm:p-7"
+      >
         <div class="text-center">
-          <div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-sm font-extrabold text-white">
+          <div
+            class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white/10 text-sm font-extrabold text-white"
+          >
             O
           </div>
           <div class="mt-3 text-sm font-semibold text-slate-200">Olympo</div>
         </div>
 
         <header class="mt-5 space-y-1 text-center">
-          <h1 class="text-2xl font-bold tracking-tight text-white">Acesse sua conta</h1>
+          <h1 class="text-2xl font-bold tracking-tight text-white">
+            Acesse sua conta
+          </h1>
           <p class="text-sm text-slate-300">Entre para acessar seu painel.</p>
         </header>
 
         <form class="mt-6 space-y-4" @submit.prevent="onSubmit">
           <label class="block space-y-1">
-            <span class="text-sm font-medium text-slate-200">Nome de usuário</span>
+            <span class="text-sm font-medium text-slate-200"
+              >Nome de usuário</span
+            >
             <input
               v-model="email"
               class="w-full rounded-lg border bg-slate-900 px-3 py-2 text-sm text-slate-50 outline-none ring-emerald-400/50 placeholder:text-slate-500 focus:ring-2"
@@ -122,7 +127,7 @@ async function onSubmit() {
                 :disabled="isSubmitting"
                 @click="showSenha = !showSenha"
               >
-                {{ showSenha ? 'Ocultar' : 'Mostrar' }}
+                {{ showSenha ? "Ocultar" : "Mostrar" }}
               </button>
             </div>
           </label>
@@ -146,7 +151,8 @@ async function onSubmit() {
           </button>
 
           <p class="text-center text-xs text-slate-300">
-            Não tem acesso? Solicite suas credenciais ao administrador da sua academia.
+            Não tem acesso? Solicite suas credenciais ao administrador da sua
+            academia.
           </p>
         </form>
       </div>
