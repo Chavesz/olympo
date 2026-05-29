@@ -49,7 +49,8 @@ app.use((req, res) => res.status(404).json({ error: 'Rota não encontrada' }))
 // ── Erro global ───────────────────────────────────────────────
 app.use((err, req, res, next) => {
   console.error(err)
-  res.status(500).json({ error: 'Erro interno do servidor' })
+  const isProd = String(process.env.NODE_ENV || '').toLowerCase() === 'production'
+  res.status(500).json({ error: 'Erro interno do servidor', ...(isProd ? {} : { details: err?.message }) })
 })
 
 // ── Start ─────────────────────────────────────────────────────
