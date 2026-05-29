@@ -1,22 +1,23 @@
-import pg from 'pg'
-import 'dotenv/config'
+import pg from "pg";
+import "dotenv/config";
 
-const { Pool } = pg
+const { Pool } = pg;
 
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || 'olympo_db',
-  user: process.env.DB_USER || 'postgres',
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
+  ssl: { rejectUnauthorized: false }, // ← adicione essa linha
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-})
+});
 
-pool.on('error', (err) => {
-  console.error('Erro inesperado no pool de conexões:', err)
-  process.exit(-1)
-})
+pool.on("error", (err) => {
+  console.error("Erro inesperado no pool de conexões:", err);
+  process.exit(-1);
+});
 
-export default pool
+export default pool;
