@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { loadUnidades } from '../services/unidades'
 import heroBg from '../assets/photo-1581009146145-b5ef050c2e1e.jpg'
 import imgDestaque from '../assets/photo-1517838277536-f5f99be501cd.jpg'
@@ -63,11 +63,94 @@ const fluxo = [
   },
 ]
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+const OFFLINE = String(import.meta.env.VITE_OFFLINE || '').toLowerCase() === 'true'
+
+const isPixOpen = ref(false)
+const pixLoading = ref(false)
+const pixError = ref('')
+const pixQr = ref('')
+const pixCopia = ref('')
+const payerEmail = ref('')
+const selectedPlan = ref(null)
+
+function openPix(plan) {
+  selectedPlan.value = plan
+  pixError.value = ''
+  pixQr.value = ''
+  pixCopia.value = ''
+  isPixOpen.value = true
+}
+
+function closePix() {
+  isPixOpen.value = false
+  pixLoading.value = false
+  pixError.value = ''
+  pixQr.value = ''
+  pixCopia.value = ''
+}
+
+function isValidEmail(value) {
+  const email = String(value ?? '').trim().toLowerCase()
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+function createIdempotencyKey() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+async function gerarPix() {
+  if (!selectedPlan.value?.amount) return
+  if (OFFLINE) {
+    pixError.value = 'Modo offline ativo. Desative VITE_OFFLINE para gerar Pix.'
+    return
+  }
+
+  const email = String(payerEmail.value ?? '').trim().toLowerCase()
+  if (!isValidEmail(email)) {
+    pixError.value = 'Informe um e-mail válido.'
+    return
+  }
+
+  pixLoading.value = true
+  pixError.value = ''
+  pixQr.value = ''
+  pixCopia.value = ''
+
+  try {
+    const res = await fetch(`${API_BASE}/pagamentos/pix`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Idempotency-Key': createIdempotencyKey(),
+      },
+      body: JSON.stringify({
+        amount: selectedPlan.value.amount,
+        description: `Plano Olympo — ${selectedPlan.value.name}`,
+        email,
+      }),
+    })
+
+    const data = await res.json().catch(() => null)
+    if (!res.ok) throw new Error(data?.error || `Erro ${res.status}`)
+
+    pixQr.value = data?.qr_code_base64 || ''
+    pixCopia.value = data?.copia_e_cola || ''
+    if (!pixQr.value || !pixCopia.value) throw new Error('Resposta do Pix incompleta')
+  } catch (err) {
+    pixError.value = err?.message || 'Falha ao gerar Pix'
+  } finally {
+    pixLoading.value = false
+  }
+}
+
 const planos = [
   {
     id: 'essencial',
     name: 'Essencial',
     price: 'R$ 199/mês',
+    amount: 199,
     badge: 'Para começar',
     features: ['1 unidade', 'Cadastros e treinos', 'Eventos e comunicados'],
   },
@@ -75,6 +158,7 @@ const planos = [
     id: 'pro',
     name: 'Pro',
     price: 'R$ 399/mês',
+    amount: 399,
     badge: 'Recomendado',
     features: ['Até 3 unidades', 'Relatórios e métricas', 'Suporte prioritário'],
   },
@@ -82,6 +166,7 @@ const planos = [
     id: 'enterprise',
     name: 'Enterprise',
     price: 'Sob consulta',
+    amount: null,
     badge: 'Escala',
     features: ['Multiunidade', 'Integrações personalizadas', 'SLA e suporte dedicado'],
   },
@@ -329,7 +414,16 @@ const planos = [
               </li>
             </ul>
 
+            <button
+              v-if="p.amount"
+              class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-bold uppercase tracking-wide text-emerald-950 hover:bg-emerald-400 disabled:opacity-60"
+              type="button"
+              @click="openPix(p)"
+            >
+              Pagar com Pix
+            </button>
             <router-link
+              v-else
               to="/login"
               class="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10"
             >
@@ -344,5 +438,67 @@ const planos = [
         </p>
       </div>
     </section>
+
+    <teleport to="body">
+      <div v-if="isPixOpen" class="fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black/60" @click="closePix" />
+        <div class="relative mx-auto flex min-h-full max-w-md items-center px-4 py-8">
+          <div class="w-full rounded-2xl border border-slate-200 bg-white p-5 text-slate-900 shadow-xl" role="dialog" aria-modal="true">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="text-lg font-bold">Pagamento via Pix</div>
+                <div class="text-sm text-slate-700">
+                  {{ selectedPlan?.name }} • R$ {{ Number(selectedPlan?.amount || 0).toFixed(2) }}
+                </div>
+              </div>
+              <button
+                class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                type="button"
+                @click="closePix"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              <label class="block space-y-1">
+                <span class="text-sm font-medium text-slate-800">E-mail do pagador</span>
+                <input
+                  v-model="payerEmail"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-slate-400 focus:ring-2"
+                  type="email"
+                  placeholder="seuemail@dominio.com"
+                />
+              </label>
+
+              <button
+                class="inline-flex w-full items-center justify-center rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-extrabold uppercase tracking-wider text-slate-950 hover:bg-amber-300 disabled:opacity-60"
+                type="button"
+                :disabled="pixLoading"
+                @click="gerarPix"
+              >
+                <span v-if="!pixLoading">Gerar Pix</span>
+                <span v-else>Gerando...</span>
+              </button>
+
+              <div v-if="pixError" class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-800" role="alert">
+                {{ pixError }}
+              </div>
+
+              <div v-if="pixQr" class="space-y-3">
+                <div class="text-sm font-semibold text-slate-900">Escaneie o QR Code</div>
+                <img
+                  :src="`data:image/jpeg;base64,${pixQr}`"
+                  alt="QR Code Pix"
+                  class="mx-auto h-56 w-56 rounded-lg border border-slate-200 bg-white p-2"
+                />
+                <div class="text-sm font-semibold text-slate-900">Ou Copia e Cola</div>
+                <textarea readonly class="h-24 w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-900">{{ pixCopia }}</textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </teleport>
   </div>
 </template>
