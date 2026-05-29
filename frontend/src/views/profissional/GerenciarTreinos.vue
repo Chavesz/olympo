@@ -1,6 +1,12 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { getEmail } from '../../services/auth'
+import {
+  createExerciseId,
+  emptyExercise,
+  getExerciciosFromFicha,
+  serializeExerciciosToText,
+} from '../../services/fichaExercises'
 import { loadAlunos, loadFichas, loadInstrutores, upsertFicha } from '../../services/mockDb'
 
 const email = computed(() => getEmail())
@@ -32,7 +38,7 @@ const form = ref({
   titulo: '',
   objetivo: '',
   status: 'ativa',
-  exerciciosText: '',
+  exercicios: [emptyExercise()],
 })
 
 watch(
@@ -41,23 +47,38 @@ watch(
     successMessage.value = ''
     formError.value = ''
     const f = fichaAtual.value
+    const exercicios = f ? getExerciciosFromFicha(f) : [emptyExercise()]
     form.value = {
       id: f?.id ?? '',
       titulo: f?.titulo ?? 'Treino A',
       objetivo: f?.objetivo ?? 'Hipertrofia',
       status: f?.status ?? 'ativa',
-      exerciciosText: f?.exerciciosText ?? 'Supino reto — 4x 8-10',
+      exercicios: exercicios.length ? exercicios : [emptyExercise()],
     }
   },
   { immediate: true },
 )
+
+function addExercise() {
+  form.value.exercicios.push(emptyExercise())
+}
+
+function removeExercise(id) {
+  if (form.value.exercicios.length <= 1) return
+  form.value.exercicios = form.value.exercicios.filter((e) => e.id !== id)
+}
 
 function validate() {
   if (!selectedAlunoId.value) return 'Selecione um aluno.'
   if (!form.value.titulo.trim()) return 'Informe o título.'
   if (!form.value.objetivo.trim()) return 'Informe o objetivo.'
   if (!['ativa', 'inativa'].includes(form.value.status)) return 'Selecione um status válido.'
-  if (!String(form.value.exerciciosText ?? '').trim()) return 'Informe pelo menos um exercício.'
+  const valid = form.value.exercicios.filter((e) => String(e.nome ?? '').trim())
+  if (valid.length === 0) return 'Adicione pelo menos um exercício com nome.'
+  for (const ex of valid) {
+    if (!String(ex.series ?? '').trim()) return `Informe as séries de "${ex.nome}".`
+    if (!String(ex.repeticoes ?? '').trim()) return `Informe as repetições de "${ex.nome}".`
+  }
   return ''
 }
 
@@ -70,6 +91,16 @@ function onSave() {
     return
   }
 
+  const exercicios = form.value.exercicios
+    .filter((e) => String(e.nome ?? '').trim())
+    .map((e) => ({
+      id: e.id || createExerciseId(),
+      nome: e.nome.trim(),
+      series: String(e.series).trim(),
+      repeticoes: String(e.repeticoes).trim(),
+      observacoes: String(e.observacoes ?? '').trim(),
+    }))
+
   const id =
     form.value.id || (typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : `f-${Date.now()}`)
 
@@ -80,7 +111,8 @@ function onSave() {
     instrutorId: instrutor.value?.id ?? '',
     objetivo: form.value.objetivo.trim(),
     status: form.value.status,
-    exerciciosText: String(form.value.exerciciosText ?? '').trim(),
+    exercicios,
+    exerciciosText: serializeExerciciosToText(exercicios),
     updatedAt: Date.now(),
   }
 
@@ -93,7 +125,9 @@ function onSave() {
   <section class="space-y-6">
     <header class="space-y-1">
       <h1 class="text-2xl font-bold tracking-tight">Gerenciar treinos</h1>
-      <p class="text-sm text-slate-700">Selecione um aluno e edite a ficha. Alterações refletem no painel do aluno.</p>
+      <p class="text-sm text-slate-700">
+        Cadastre cada exercício com nome, séries, repetições e observações. O aluno vê os campos separados.
+      </p>
     </header>
 
     <div class="grid gap-4 lg:grid-cols-3">
@@ -194,19 +228,80 @@ function onSave() {
                 <option value="inativa">Inativa</option>
               </select>
             </label>
+          </div>
 
-            <label class="block space-y-1 sm:col-span-2">
-              <span class="text-sm font-medium text-slate-800">Exercícios</span>
-              <textarea
-                v-model="form.exerciciosText"
-                class="min-h-40 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
-                placeholder="Um exercício por linha (ex.: Supino reto — 4x 8-10 — observações)"
-              />
-            </label>
+          <div class="mt-6 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-slate-900">Exercícios</span>
+              <button
+                class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-900 hover:bg-slate-50"
+                type="button"
+                @click="addExercise"
+              >
+                + Adicionar exercício
+              </button>
+            </div>
+
+            <div
+              v-for="(ex, index) in form.exercicios"
+              :key="ex.id"
+              class="rounded-lg border border-slate-200 bg-slate-50 p-3"
+            >
+              <div class="mb-2 flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Exercício {{ index + 1 }}
+                </span>
+                <button
+                  v-if="form.exercicios.length > 1"
+                  class="text-xs font-semibold text-rose-600 hover:text-rose-700"
+                  type="button"
+                  @click="removeExercise(ex.id)"
+                >
+                  Remover
+                </button>
+              </div>
+              <div class="grid gap-2 sm:grid-cols-2">
+                <label class="block space-y-1 sm:col-span-2">
+                  <span class="text-xs font-medium text-slate-700">Nome</span>
+                  <input
+                    v-model="ex.nome"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
+                    type="text"
+                    placeholder="Ex.: Supino reto"
+                  />
+                </label>
+                <label class="block space-y-1">
+                  <span class="text-xs font-medium text-slate-700">Séries</span>
+                  <input
+                    v-model="ex.series"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
+                    type="text"
+                    placeholder="4"
+                  />
+                </label>
+                <label class="block space-y-1">
+                  <span class="text-xs font-medium text-slate-700">Repetições</span>
+                  <input
+                    v-model="ex.repeticoes"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
+                    type="text"
+                    placeholder="8-10"
+                  />
+                </label>
+                <label class="block space-y-1 sm:col-span-2">
+                  <span class="text-xs font-medium text-slate-700">Observações</span>
+                  <input
+                    v-model="ex.observacoes"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
+                    type="text"
+                    placeholder="Opcional"
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 </template>
-

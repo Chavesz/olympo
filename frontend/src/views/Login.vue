@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { setAuth } from '../services/auth'
+import { DEV_BYPASS_ENABLED, setAuth, setDevAuth } from '../services/auth'
 import { api } from '../services/api'
 import heroBg from '../assets/photo-1581009146145-b5ef050c2e1e.jpg'
 
@@ -64,6 +64,13 @@ async function onSubmit() {
   } finally {
     isSubmitting.value = false
   }
+}
+
+function devLogin(role) {
+  setDevAuth(role)
+  const fallback =
+    role === 'admin' ? '/admin' : role === 'aluno' ? '/aluno' : '/profissional'
+  router.push(redirectTo.value || fallback)
 }
 </script>
 
@@ -176,6 +183,38 @@ async function onSubmit() {
         <p class="text-center text-[11px] leading-relaxed text-slate-400">
           Não tem acesso? Solicite suas credenciais ao administrador da sua academia.
         </p>
+
+        <div
+          v-if="DEV_BYPASS_ENABLED"
+          class="mt-4 space-y-2 rounded-lg border border-dashed border-amber-400/40 bg-amber-400/5 p-3"
+        >
+          <p class="text-center text-[11px] font-medium text-amber-200/90">
+            Modo dev — entrar sem backend
+          </p>
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <button
+              type="button"
+              class="rounded-lg border border-white/15 bg-slate-950/50 px-2 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-200 hover:bg-white/10"
+              @click="devLogin('admin')"
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              class="rounded-lg border border-white/15 bg-slate-950/50 px-2 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-200 hover:bg-white/10"
+              @click="devLogin('instrutor')"
+            >
+              Profissional
+            </button>
+            <button
+              type="button"
+              class="rounded-lg border border-white/15 bg-slate-950/50 px-2 py-2 text-[10px] font-bold uppercase tracking-wide text-slate-200 hover:bg-white/10"
+              @click="devLogin('aluno')"
+            >
+              Aluno
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   </section>

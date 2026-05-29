@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import hero from '../../assets/hero.png'
-import { deleteEvento, loadEventos, upsertEvento } from '../../services/mockPortal'
+import { resolveAlunoNomeBySubscriptionKey } from '../../services/mockDb'
+import { deleteEvento, listEventSubscriptionKeys, loadEventos, upsertEvento } from '../../services/mockPortal'
 
 const query = ref('')
 const eventos = ref(loadEventos())
@@ -9,6 +10,10 @@ const eventos = ref(loadEventos())
 const isModalOpen = ref(false)
 const isEditing = ref(false)
 const formError = ref('')
+
+const isInscritosOpen = ref(false)
+const inscritosEvento = ref(null)
+const inscritosLista = ref([])
 
 const form = ref({
   id: '',
@@ -106,6 +111,22 @@ function onDelete(e) {
   if (!ok) return
   eventos.value = deleteEvento(e.id)
 }
+
+function openInscritos(e) {
+  inscritosEvento.value = e
+  const keys = listEventSubscriptionKeys(e.id)
+  inscritosLista.value = keys.map((key) => ({
+    key,
+    nome: resolveAlunoNomeBySubscriptionKey(key),
+  }))
+  isInscritosOpen.value = true
+}
+
+function closeInscritos() {
+  isInscritosOpen.value = false
+  inscritosEvento.value = null
+  inscritosLista.value = []
+}
 </script>
 
 <template>
@@ -148,27 +169,71 @@ function onDelete(e) {
           </div>
           <p class="mt-2 text-sm text-slate-700 line-clamp-3">{{ e.descricao }}</p>
 
-          <div class="mt-4 flex gap-2">
+          <div class="mt-4 flex flex-col gap-2">
             <button
-              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+              class="w-full rounded-lg border border-sky-300 bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-800 hover:bg-sky-100"
               type="button"
-              @click="openEdit(e)"
+              @click="openInscritos(e)"
             >
-              Editar
+              Ver inscritos ({{ e.inscritos }})
             </button>
-            <button
-              class="w-full rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100"
-              type="button"
-              @click="onDelete(e)"
-            >
-              Excluir
-            </button>
+            <div class="flex gap-2">
+              <button
+                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                type="button"
+                @click="openEdit(e)"
+              >
+                Editar
+              </button>
+              <button
+                class="w-full rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100"
+                type="button"
+                @click="onDelete(e)"
+              >
+                Excluir
+              </button>
+            </div>
           </div>
         </div>
       </article>
     </div>
 
     <teleport to="body">
+      <div v-if="isInscritosOpen" class="fixed inset-0 z-50">
+        <div class="absolute inset-0 bg-black/50" @click="closeInscritos" />
+
+        <div class="relative mx-auto flex min-h-full max-w-md items-center px-4 py-8">
+          <div class="w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-xl" role="dialog" aria-modal="true">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="text-lg font-bold text-slate-900">Inscritos</div>
+                <div class="text-sm text-slate-700">{{ inscritosEvento?.nome }}</div>
+              </div>
+              <button
+                class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                type="button"
+                @click="closeInscritos"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <ul class="mt-4 max-h-80 divide-y divide-slate-200 overflow-auto rounded-lg border border-slate-200">
+              <li
+                v-for="item in inscritosLista"
+                :key="item.key"
+                class="px-4 py-3 text-sm font-semibold text-slate-900"
+              >
+                {{ item.nome }}
+              </li>
+              <li v-if="inscritosLista.length === 0" class="px-4 py-6 text-center text-sm text-slate-700">
+                Nenhum aluno inscrito neste evento.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <div v-if="isModalOpen" class="fixed inset-0 z-50">
         <div class="absolute inset-0 bg-black/50" @click="closeModal" />
 

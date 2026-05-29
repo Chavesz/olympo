@@ -57,6 +57,9 @@ function subscribe(modalidade, slot) {
               <div class="text-xs text-slate-500">{{ s.inscritos }}/{{ s.vagas }}</div>
             </div>
             <div class="mt-1 text-sm text-slate-700">{{ s.horario }}</div>
+            <div class="mt-2 text-xs text-slate-600">
+              <span class="font-medium text-slate-800">Instrutor:</span> {{ s.instrutor }}
+            </div>
 
             <button
               class="mt-3 inline-flex w-full items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold"
@@ -81,4 +84,3 @@ function subscribe(modalidade, slot) {
     </div>
   </section>
 </template>
-

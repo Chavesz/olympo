@@ -1,7 +1,8 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { clearAuth, getEmail, getUserId } from '../services/auth'
+import { clearAuth, getEmail } from '../services/auth'
+import logo from '../assets/logomarca-olympo-28052026 (1).png'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,16 +11,15 @@ const isMenuOpen = ref(false)
 const isProfileOpen = ref(false)
 
 const email = computed(() => getEmail())
-const userId = computed(() => getUserId())
-
 const initials = computed(() => 'AD')
 
 const links = [
   { label: 'Painel', to: '/admin' },
-  { label: 'Usuários', to: '/admin/usuarios' },
-  { label: 'Alunos', to: '/admin/alunos' },
-  { label: 'Instrutores', to: '/admin/instrutores' },
-  { label: 'Fichas', to: '/admin/fichas' },
+  { label: 'Gerenciar usuários', to: '/admin/usuarios' },
+  { label: 'Fichas de treino', to: '/admin/fichas' },
+  { label: 'Unidades', to: '/admin/unidades' },
+  { label: 'Equipamentos', to: '/admin/equipamentos' },
+  { label: 'Relatórios', to: '/admin/relatorios' },
 ]
 
 watch(
@@ -51,15 +51,13 @@ async function logout() {
           </svg>
         </button>
 
-        <div class="flex items-center gap-2">
-          <div class="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-sm font-extrabold text-white">
-            O
-          </div>
+        <router-link class="flex items-center gap-2" to="/admin">
+          <img :src="logo" alt="Olympo" class="h-9 w-9 rounded-lg object-contain" />
           <div class="leading-tight">
             <div class="text-sm font-semibold">Olympo</div>
             <div class="text-[11px] text-slate-500">Administrador</div>
           </div>
-        </div>
+        </router-link>
 
         <div class="relative">
           <button
@@ -68,9 +66,7 @@ async function logout() {
             aria-label="Abrir menu do perfil"
             @click="isProfileOpen = !isProfileOpen"
           >
-            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10">
-              {{ initials }}
-            </span>
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10">{{ initials }}</span>
             <span class="hidden sm:inline">Admin</span>
           </button>
 
@@ -78,14 +74,13 @@ async function logout() {
             v-if="isProfileOpen"
             class="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
           >
-            <div class="px-3 py-2">
+            <div class="px-4 py-3">
               <div class="text-sm font-semibold text-slate-900">Administrador</div>
               <div class="text-xs text-slate-600">{{ email }}</div>
-              <div v-if="userId" class="mt-1 text-[11px] text-slate-500">{{ userId }}</div>
             </div>
             <div class="border-t border-slate-200">
               <button
-                class="flex w-full items-center justify-between px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                class="flex w-full items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50"
                 type="button"
                 @click="logout"
               >
@@ -107,18 +102,16 @@ async function logout() {
     <main class="mx-auto max-w-6xl px-4 pb-10 pt-20">
       <router-view />
     </main>
+
     <teleport to="body">
       <div v-if="isMenuOpen" class="fixed inset-0 z-50">
         <div class="absolute inset-0 bg-black/50" @click="isMenuOpen = false" />
-
 
         <aside class="relative h-full w-full max-w-sm bg-white shadow-xl" role="dialog" aria-modal="true">
           <div class="border-b border-slate-200 p-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
-                <div
-                  class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white"
-                >
+                <div class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
                   {{ initials }}
                 </div>
                 <div>
@@ -126,7 +119,6 @@ async function logout() {
                   <div class="text-xs text-slate-600">{{ email }}</div>
                 </div>
               </div>
-
               <button
                 class="inline-flex h-10 w-10 items-center justify-center rounded-lg hover:bg-slate-100"
                 type="button"

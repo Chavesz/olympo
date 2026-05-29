@@ -19,6 +19,7 @@ const seedAlunos = [
     dataNascimento: '2001-04-12',
     dataMatricula: '2025-02-03',
     planoAtivo: 'Mensal',
+    unidadeId: 'un-centro',
     status: 'ativo',
   },
   {
@@ -29,6 +30,7 @@ const seedAlunos = [
     dataNascimento: '2002-09-20',
     dataMatricula: '2024-10-15',
     planoAtivo: 'Anual',
+    unidadeId: 'un-norte',
     status: 'inativo',
   },
   {
@@ -39,6 +41,7 @@ const seedAlunos = [
     dataNascimento: '1999-12-05',
     dataMatricula: '2025-06-01',
     planoAtivo: 'Mensal',
+    unidadeId: 'un-centro',
     status: 'ativo',
   },
 ]
@@ -70,6 +73,13 @@ const seedFichas = [
     instrutorId: 'i-1',
     objetivo: 'Hipertrofia',
     status: 'ativa',
+    exercicios: [
+      { id: 'ex-1', nome: 'Supino reto', series: '4', repeticoes: '8-10', observacoes: '' },
+      { id: 'ex-2', nome: 'Puxada na barra', series: '4', repeticoes: '10-12', observacoes: '' },
+      { id: 'ex-3', nome: 'Desenvolvimento', series: '3', repeticoes: '8-10', observacoes: '' },
+      { id: 'ex-4', nome: 'Rosca direta', series: '3', repeticoes: '10-12', observacoes: '' },
+      { id: 'ex-5', nome: 'Tríceps corda', series: '3', repeticoes: '12-15', observacoes: '' },
+    ],
     exerciciosText:
       'Supino reto — 4x 8-10\nPuxada na barra — 4x 10-12\nDesenvolvimento — 3x 8-10\nRosca direta — 3x 10-12\nTríceps corda — 3x 12-15',
     updatedAt: Date.now(),
@@ -200,4 +210,37 @@ export function deleteFicha(fichaId) {
   const fichas = loadFichas().filter((f) => f.id !== fichaId)
   saveFichas(fichas)
   return fichas
+}
+
+/** Resolve nome do aluno a partir da chave usada em inscrições (user id, aluno id ou dev). */
+export function resolveAlunoNomeBySubscriptionKey(key) {
+  if (!key) return 'Aluno'
+
+  const users = loadUsers()
+  const alunos = loadAlunos()
+
+  const user = users.find((u) => u.id === key)
+  if (user) {
+    const aluno = alunos.find((a) => String(a.email).toLowerCase() === String(user.email).toLowerCase())
+    return aluno?.nome ?? user.nome ?? user.email
+  }
+
+  const byAlunoId = alunos.find((a) => a.id === key)
+  if (byAlunoId) return byAlunoId.nome
+
+  for (const aluno of alunos) {
+    const linked = users.find((u) => String(u.email).toLowerCase() === String(aluno.email).toLowerCase())
+    if (linked?.id === key) return aluno.nome
+  }
+
+  const devEmails = {
+    'dev-aluno': 'jonh@olympo.dev',
+  }
+  const mappedEmail = devEmails[key]
+  if (mappedEmail) {
+    const aluno = alunos.find((a) => String(a.email).toLowerCase() === mappedEmail)
+    if (aluno) return aluno.nome
+  }
+
+  return 'Aluno'
 }

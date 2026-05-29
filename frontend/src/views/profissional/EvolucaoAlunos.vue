@@ -27,12 +27,20 @@ const form = ref({
   peso: '',
   altura: '',
   gordura: '',
+  observacao: '',
 })
 
 function openCreate() {
   formError.value = ''
   isEditing.value = false
-  form.value = { id: '', data: new Date().toISOString().slice(0, 10), peso: '', altura: '', gordura: '' }
+  form.value = {
+    id: '',
+    data: new Date().toISOString().slice(0, 10),
+    peso: '',
+    altura: '',
+    gordura: '',
+    observacao: '',
+  }
   isModalOpen.value = true
 }
 
@@ -45,6 +53,7 @@ function openEdit(x) {
     peso: String(x.peso ?? ''),
     altura: String(x.altura ?? ''),
     gordura: String(x.gordura ?? ''),
+    observacao: x.observacao ?? '',
   }
   isModalOpen.value = true
 }
@@ -82,6 +91,7 @@ function onSave() {
     peso: Number(form.value.peso),
     altura: Number(form.value.altura),
     gordura: Number(form.value.gordura),
+    observacao: String(form.value.observacao ?? '').trim(),
   }
 
   const next = [...items.value]
@@ -144,6 +154,7 @@ function onDelete(x) {
               <th class="px-4 py-3">Peso</th>
               <th class="px-4 py-3">Altura</th>
               <th class="px-4 py-3">% Gordura</th>
+              <th class="px-4 py-3">Observação</th>
               <th class="px-4 py-3 text-right">Ações</th>
             </tr>
           </thead>
@@ -153,6 +164,7 @@ function onDelete(x) {
               <td class="px-4 py-3 text-slate-700">{{ x.peso.toFixed(1) }} kg</td>
               <td class="px-4 py-3 text-slate-700">{{ x.altura.toFixed(2) }} m</td>
               <td class="px-4 py-3 text-slate-700">{{ x.gordura.toFixed(1) }}%</td>
+              <td class="max-w-xs px-4 py-3 text-slate-700">{{ x.observacao || '—' }}</td>
               <td class="px-4 py-3">
                 <div class="flex justify-end gap-2">
                   <button
@@ -173,7 +185,7 @@ function onDelete(x) {
               </td>
             </tr>
             <tr v-if="items.length === 0">
-              <td class="px-4 py-8 text-center text-sm text-slate-700" colspan="5">Sem avaliações.</td>
+              <td class="px-4 py-8 text-center text-sm text-slate-700" colspan="6">Sem avaliações.</td>
             </tr>
           </tbody>
         </table>
@@ -246,6 +258,16 @@ function onDelete(x) {
                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
                   type="number"
                   step="0.1"
+                />
+              </label>
+
+              <label class="block space-y-1 sm:col-span-2">
+                <span class="text-sm font-medium text-slate-800">Observação (opcional)</span>
+                <textarea
+                  v-model="form.observacao"
+                  class="min-h-[72px] w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
+                  rows="3"
+                  placeholder="Notas do instrutor sobre a avaliação"
                 />
               </label>
             </div>

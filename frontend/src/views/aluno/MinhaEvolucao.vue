@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { getEmail } from '../../services/auth'
 import { loadAlunos } from '../../services/mockDb'
-import { loadEvaluations } from '../../services/evaluations'
+import { computeImc, loadEvaluations } from '../../services/evaluations'
 
 const email = computed(() => getEmail())
 const aluno = computed(() => {
@@ -12,16 +12,23 @@ const aluno = computed(() => {
 
 const medidas = computed(() => {
   if (!aluno.value) return []
-  const evals = loadEvaluations(aluno.value.id)
-  return evals
+  return loadEvaluations(aluno.value.id)
     .slice()
     .sort((a, b) => String(a.data).localeCompare(String(b.data)))
-    .map((e) => ({ data: e.data, peso: e.peso, gordura: e.gordura }))
+    .map((e) => ({
+      id: e.id,
+      data: e.data,
+      peso: e.peso,
+      altura: e.altura,
+      gordura: e.gordura,
+      imc: computeImc(e.peso, e.altura),
+      observacao: e.observacao?.trim() || '',
+    }))
 })
 
 const weights = computed(() => medidas.value.map((m) => m.peso))
-const minW = computed(() => Math.min(...weights.value))
-const maxW = computed(() => Math.max(...weights.value))
+const minW = computed(() => (weights.value.length ? Math.min(...weights.value) : 0))
+const maxW = computed(() => (weights.value.length ? Math.max(...weights.value) : 0))
 
 const points = computed(() => {
   if (medidas.value.length === 0) return ''
@@ -49,22 +56,25 @@ function fmtDate(value) {
   <section class="space-y-6">
     <header class="space-y-1">
       <h1 class="text-2xl font-bold tracking-tight">Minha evolução</h1>
-      <p class="text-sm text-slate-700">Medidas registradas pelo profissional (somente leitura).</p>
+      <p class="text-sm text-slate-700">
+        Medidas registradas pelo profissional (somente leitura). Campos alinhados ao banco: peso, altura, IMC, gordura e
+        observação.
+      </p>
     </header>
 
     <div class="rounded-xl border border-slate-200 bg-white p-4">
       <div class="flex items-center justify-between">
         <div>
           <div class="text-sm font-semibold text-slate-900">Peso (kg)</div>
-          <div class="text-sm text-slate-700">Evolução mensal</div>
+          <div class="text-sm text-slate-700">Evolução ao longo das avaliações</div>
         </div>
-        <div class="text-xs text-slate-500">placeholder</div>
       </div>
 
       <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 p-3">
-        <svg viewBox="0 0 260 80" class="h-24 w-full">
+        <svg v-if="medidas.length" viewBox="0 0 260 80" class="h-24 w-full">
           <polyline :points="points" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" />
         </svg>
+        <p v-else class="text-center text-sm text-slate-600">Sem dados para o gráfico.</p>
       </div>
     </div>
 
@@ -76,17 +86,23 @@ function fmtDate(value) {
             <tr>
               <th class="px-4 py-3">Data</th>
               <th class="px-4 py-3">Peso</th>
+              <th class="px-4 py-3">Altura</th>
+              <th class="px-4 py-3">IMC</th>
               <th class="px-4 py-3">% Gordura</th>
+              <th class="px-4 py-3">Observação</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200">
-            <tr v-for="m in medidas" :key="m.data">
+            <tr v-for="m in medidas" :key="m.id">
               <td class="px-4 py-3 font-semibold text-slate-900">{{ fmtDate(m.data) }}</td>
               <td class="px-4 py-3 text-slate-700">{{ m.peso.toFixed(1) }} kg</td>
+              <td class="px-4 py-3 text-slate-700">{{ m.altura.toFixed(2) }} m</td>
+              <td class="px-4 py-3 text-slate-700">{{ m.imc != null ? m.imc.toFixed(1) : '—' }}</td>
               <td class="px-4 py-3 text-slate-700">{{ m.gordura.toFixed(1) }}%</td>
+              <td class="max-w-xs px-4 py-3 text-slate-700">{{ m.observacao || '—' }}</td>
             </tr>
             <tr v-if="medidas.length === 0">
-              <td class="px-4 py-8 text-center text-sm text-slate-700" colspan="3">Sem avaliações registradas.</td>
+              <td class="px-4 py-8 text-center text-sm text-slate-700" colspan="6">Sem avaliações registradas.</td>
             </tr>
           </tbody>
         </table>

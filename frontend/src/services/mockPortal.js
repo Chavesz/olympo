@@ -51,25 +51,35 @@ const seedAulas = [
   {
     modalidade: 'Pilates',
     slots: [
-      { id: 'pi-1', dia: 'Segunda', horario: '07:00', vagas: 10, inscritos: 6 },
-      { id: 'pi-2', dia: 'Quarta', horario: '19:00', vagas: 10, inscritos: 10 },
+      { id: 'pi-1', dia: 'Segunda', horario: '07:00', vagas: 10, inscritos: 6, instrutor: 'Ana Souza' },
+      { id: 'pi-2', dia: 'Quarta', horario: '19:00', vagas: 10, inscritos: 10, instrutor: 'Ana Souza' },
     ],
   },
   {
     modalidade: 'Funcional',
     slots: [
-      { id: 'fu-1', dia: 'Terça', horario: '18:00', vagas: 20, inscritos: 12 },
-      { id: 'fu-2', dia: 'Quinta', horario: '06:30', vagas: 20, inscritos: 5 },
+      { id: 'fu-1', dia: 'Terça', horario: '18:00', vagas: 20, inscritos: 12, instrutor: 'Felipe Silva' },
+      { id: 'fu-2', dia: 'Quinta', horario: '06:30', vagas: 20, inscritos: 5, instrutor: 'Felipe Silva' },
     ],
   },
   {
     modalidade: 'Spinning',
     slots: [
-      { id: 'sp-1', dia: 'Segunda', horario: '20:00', vagas: 18, inscritos: 18 },
-      { id: 'sp-2', dia: 'Sexta', horario: '07:00', vagas: 18, inscritos: 10 },
+      { id: 'sp-1', dia: 'Segunda', horario: '20:00', vagas: 18, inscritos: 18, instrutor: 'Felipe Silva' },
+      { id: 'sp-2', dia: 'Sexta', horario: '07:00', vagas: 18, inscritos: 10, instrutor: 'Ana Souza' },
     ],
   },
 ]
+
+function normalizeAulas(aulas) {
+  return aulas.map((m) => ({
+    ...m,
+    slots: (m.slots ?? []).map((s) => ({
+      ...s,
+      instrutor: s.instrutor || 'A definir',
+    })),
+  }))
+}
 
 const seedComunicados = [
   {
@@ -110,9 +120,10 @@ export function saveEventos(eventos) {
 export function loadAulas() {
   const raw = localStorage.getItem(AULAS_KEY)
   const parsed = raw ? safeParse(raw) : null
-  if (Array.isArray(parsed)) return parsed
-  localStorage.setItem(AULAS_KEY, JSON.stringify(seedAulas))
-  return [...seedAulas]
+  if (Array.isArray(parsed)) return normalizeAulas(parsed)
+  const seeded = normalizeAulas(seedAulas)
+  localStorage.setItem(AULAS_KEY, JSON.stringify(seeded))
+  return seeded
 }
 
 export function saveAulas(aulas) {
@@ -203,4 +214,14 @@ export function deleteComunicado(comunicadoId) {
   const comunicados = loadComunicados().filter((c) => c.id !== comunicadoId)
   saveComunicados(comunicados)
   return comunicados
+}
+
+/** Lista inscritos em um evento com chave de usuário e nome resolvido externamente. */
+export function listEventSubscriptionKeys(eventId) {
+  const keys = []
+  for (const userId of listSubscriptionUserIds()) {
+    const subs = loadSubscriptions(userId)
+    if (subs.some((s) => s.type === 'evento' && s.id === eventId)) keys.push(userId)
+  }
+  return keys
 }

@@ -1,8 +1,9 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { clearAuth, getEmail, getUserId } from '../services/auth'
+import { clearAuth, getEmail } from '../services/auth'
 import { loadInstrutores } from '../services/mockDb'
+import logo from '../assets/logomarca-olympo-28052026 (1).png'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,7 +12,6 @@ const isMenuOpen = ref(false)
 const isProfileOpen = ref(false)
 
 const email = computed(() => getEmail())
-const userId = computed(() => getUserId())
 
 const instrutor = computed(() => {
   const normalizedEmail = String(email.value ?? '').toLowerCase()
@@ -31,7 +31,6 @@ const initials = computed(() => {
 const links = [
   { label: 'Início', to: '/profissional' },
   { label: 'Gerenciar Alunos', to: '/profissional/alunos' },
-  { label: 'Ficha do Aluno', to: '/profissional/alunos' },
   { label: 'Gerenciar Treinos', to: '/profissional/treinos' },
   { label: 'Evolução dos Alunos', to: '/profissional/evolucao' },
   { label: 'Gerenciar Planos', to: '/profissional/planos' },
@@ -70,12 +69,10 @@ async function logout() {
           </svg>
         </button>
 
-        <div class="flex items-center gap-2">
-          <div class="grid h-9 w-9 place-items-center rounded-xl bg-slate-900 text-sm font-extrabold text-white">
-            O
-          </div>
+        <router-link class="flex items-center gap-2" to="/profissional">
+          <img :src="logo" alt="Olympo" class="h-9 w-9 rounded-lg object-contain" />
           <div class="text-sm font-semibold">Olympo</div>
-        </div>
+        </router-link>
 
         <div class="relative">
           <button
@@ -90,16 +87,25 @@ async function logout() {
 
           <div
             v-if="isProfileOpen"
-            class="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+            class="absolute right-0 mt-2 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
           >
-            <div class="px-3 py-2">
+            <div class="px-4 py-3">
               <div class="text-sm font-semibold text-slate-900">{{ nome }}</div>
               <div class="text-xs text-slate-600">{{ email }}</div>
-              <div v-if="userId" class="mt-1 text-[11px] text-slate-500">{{ userId }}</div>
+              <dl class="mt-2 space-y-1 text-xs text-slate-600">
+                <div v-if="instrutor?.cref">
+                  <dt class="inline font-medium text-slate-800">CREF: </dt>
+                  <dd class="inline">{{ instrutor.cref }}</dd>
+                </div>
+                <div v-if="instrutor?.especialidade">
+                  <dt class="inline font-medium text-slate-800">Especialidade: </dt>
+                  <dd class="inline">{{ instrutor.especialidade }}</dd>
+                </div>
+              </dl>
             </div>
             <div class="border-t border-slate-200">
               <button
-                class="flex w-full items-center justify-between px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+                class="flex w-full items-center justify-between px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-slate-50"
                 type="button"
                 @click="logout"
               >
@@ -157,7 +163,7 @@ async function logout() {
           <nav class="p-2">
             <router-link
               v-for="l in links"
-              :key="l.to"
+              :key="l.label"
               class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100"
               :to="l.to"
               @click="isMenuOpen = false"

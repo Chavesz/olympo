@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { loadAlunos, loadUsers } from '../../services/mockDb'
+import { loadAlunos, loadUsers, resolveAlunoNomeBySubscriptionKey } from '../../services/mockDb'
 import {
   listSubscriptionUserIds,
   loadAulas,
@@ -25,9 +25,7 @@ function alunoByEmail(email) {
 }
 
 function userName(userId) {
-  const u = users.value.find((x) => x.id === userId)
-  const a = alunoByEmail(u?.email)
-  return a?.nome ?? u?.nome ?? u?.email ?? userId
+  return resolveAlunoNomeBySubscriptionKey(userId)
 }
 
 function buildRows() {
@@ -272,7 +270,14 @@ function manualAdd() {
               <td class="px-4 py-3 font-semibold text-slate-900">{{ r.aluno }}</td>
               <td class="px-4 py-3 text-slate-700">{{ r.itemName }}</td>
               <td class="px-4 py-3 text-slate-700">{{ r.when }}</td>
-              <td class="px-4 py-3 text-slate-700">{{ r.kind }}</td>
+              <td class="px-4 py-3 text-slate-700">
+                <span
+                  class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold capitalize"
+                  :class="r.kind === 'evento' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'"
+                >
+                  {{ r.kind === 'evento' ? 'Evento' : 'Aula coletiva' }}
+                </span>
+              </td>
               <td class="px-4 py-3">
                 <div class="flex justify-end">
                   <button

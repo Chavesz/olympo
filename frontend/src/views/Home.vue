@@ -1,9 +1,13 @@
 <script setup>
+import { computed } from 'vue'
+import { loadUnidades } from '../services/unidades'
 import heroBg from '../assets/photo-1581009146145-b5ef050c2e1e.jpg'
 import imgDestaque from '../assets/photo-1517838277536-f5f99be501cd.jpg'
 import imgAdmin from '../assets/photo-1517838277536-f5f99be501cd.jpg'
 import imgProfissional from '../assets/photo-1534438327276-14e5300c3a48.jpg'
 import imgAluno from '../assets/photo-1518611012118-696072aa579a.jpg'
+
+const unidades = computed(() => loadUnidades())
 
 function scrollTo(id) {
   const el = document.getElementById(id)
@@ -251,6 +255,45 @@ const planos = [
             </div>
           </article>
         </div>
+      </div>
+    </section>
+
+    <!-- Unidades (cadastro admin) -->
+    <section id="unidades" class="relative overflow-hidden py-16">
+      <div class="absolute inset-0">
+        <img :src="heroBg" alt="" class="h-full w-full object-cover opacity-15" />
+        <div class="absolute inset-0 bg-slate-950/92" />
+      </div>
+
+      <div class="relative mx-auto max-w-6xl space-y-6 px-4">
+        <header class="text-center">
+          <h2 class="text-3xl font-extrabold uppercase tracking-tight text-amber-400 sm:text-4xl">Nossas unidades</h2>
+          <p class="mt-2 text-sm text-slate-300 sm:text-base">Conheça onde a Olympo está presente.</p>
+        </header>
+
+        <div v-for="u in unidades" :key="u.id" class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/80 backdrop-blur lg:grid lg:grid-cols-[minmax(0,340px)_1fr]">
+          <img v-if="u.imagem" :src="u.imagem" :alt="u.nome" class="h-56 w-full object-cover lg:h-full lg:min-h-[260px]" />
+          <div class="p-6 sm:p-8">
+            <h3 class="text-2xl font-extrabold uppercase tracking-tight text-amber-400">{{ u.nome }}</h3>
+            <dl class="mt-5 space-y-2 text-sm text-slate-200">
+              <div><dt class="inline font-semibold text-white">Endereço: </dt><dd class="inline">{{ u.endereco }}</dd></div>
+              <div><dt class="inline font-semibold text-white">Funcionamento: </dt><dd class="inline">{{ u.horario }}</dd></div>
+              <div><dt class="inline font-semibold text-white">WhatsApp: </dt><dd class="inline">{{ u.telefone }}</dd></div>
+              <div v-if="u.planoMensal"><dt class="inline font-semibold text-white">Plano mensal: </dt><dd class="inline">{{ u.planoMensal }}</dd></div>
+              <div v-if="u.planoAnual"><dt class="inline font-semibold text-white">Plano anual: </dt><dd class="inline">{{ u.planoAnual }}</dd></div>
+            </dl>
+            <router-link
+              to="/login"
+              class="mt-6 inline-flex items-center gap-2 rounded-lg bg-amber-400 px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-950 hover:bg-amber-300"
+            >
+              Solicitar acesso
+            </router-link>
+          </div>
+        </div>
+
+        <p v-if="unidades.length === 0" class="text-center text-sm text-slate-400">
+          Em breve novas unidades.
+        </p>
       </div>
     </section>
 

@@ -39,3 +39,19 @@ export function setAuth(auth) {
 export function clearAuth() {
   localStorage.removeItem(STORAGE_KEY)
 }
+
+/** Apenas em `npm run dev` com VITE_DEV_BYPASS_AUTH=true — entra sem backend. */
+export const DEV_BYPASS_ENABLED =
+  import.meta.env.DEV && import.meta.env.VITE_DEV_BYPASS_AUTH === 'true'
+
+const DEV_PROFILES = {
+  admin: { role: 'admin', email: 'admin@olympo.dev', userId: 'u-1' },
+  instrutor: { role: 'instrutor', email: 'felipe@olympo.dev', userId: 'dev-instrutor' },
+  aluno: { role: 'aluno', email: 'jonh@olympo.dev', userId: 'dev-aluno' },
+}
+
+export function setDevAuth(role) {
+  const profile = DEV_PROFILES[role]
+  if (!profile) return
+  setAuth({ token: 'dev-bypass', ...profile })
+}

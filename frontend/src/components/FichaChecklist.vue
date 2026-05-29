@@ -1,26 +1,13 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { getExerciciosFromFicha } from '../services/fichaExercises'
 import { loadProgress, saveProgress } from '../services/progress'
 
 const props = defineProps({
   ficha: { type: Object, required: true },
 })
 
-function parseExercises(text) {
-  const lines = String(text ?? '')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-
-  return lines.map((raw, idx) => {
-    const [nomeRaw, detalheRaw] = raw.split('—').map((p) => p?.trim())
-    const nome = nomeRaw || raw
-    const detalhe = detalheRaw || ''
-    return { id: `ex-${idx + 1}`, nome, detalhe }
-  })
-}
-
-const exercises = computed(() => parseExercises(props.ficha.exerciciosText))
+const exercises = computed(() => getExerciciosFromFicha(props.ficha))
 const progress = ref({})
 
 watch(
@@ -90,7 +77,12 @@ const percent = computed(() => (total.value === 0 ? 0 : Math.round((done.value /
               </span>
             </div>
 
-            <div v-if="e.detalhe" class="mt-1 text-sm text-slate-700">{{ e.detalhe }}</div>
+            <div class="mt-1 text-sm text-slate-700">
+              <span v-if="e.series">Séries: {{ e.series }}</span>
+              <span v-if="e.series && e.repeticoes"> · </span>
+              <span v-if="e.repeticoes">Repetições: {{ e.repeticoes }}</span>
+            </div>
+            <div v-if="e.observacoes" class="mt-1 text-xs text-slate-500">{{ e.observacoes }}</div>
           </div>
         </li>
       </ul>

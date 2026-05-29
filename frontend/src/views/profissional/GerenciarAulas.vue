@@ -1,6 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { loadInstrutores } from '../../services/mockDb'
 import { loadAulas, removeSlotFromAllSubscriptions, saveAulas, upsertComunicado } from '../../services/mockPortal'
+
+const instrutores = loadInstrutores().filter((i) => i.status === 'ativo')
 
 const aulas = ref(loadAulas())
 
@@ -14,6 +17,7 @@ const form = ref({
   dia: 'Segunda',
   horario: '07:00',
   vagas: '10',
+  instrutor: instrutores[0]?.nome ?? '',
 })
 
 const modalidades = computed(() => aulas.value.map((m) => m.modalidade))
@@ -28,6 +32,7 @@ function openCreate() {
     dia: 'Segunda',
     horario: '07:00',
     vagas: '10',
+    instrutor: instrutores[0]?.nome ?? '',
   }
   isModalOpen.value = true
 }
@@ -41,6 +46,7 @@ function openEdit(modalidade, slot) {
     dia: slot.dia,
     horario: slot.horario,
     vagas: String(slot.vagas),
+    instrutor: slot.instrutor ?? instrutores[0]?.nome ?? '',
   }
   isModalOpen.value = true
 }
@@ -55,6 +61,7 @@ function validate() {
   if (!String(form.value.horario ?? '').trim()) return 'Informe o horário.'
   const vagas = Number(form.value.vagas)
   if (!Number.isFinite(vagas) || vagas <= 0) return 'Informe a capacidade máxima.'
+  if (!String(form.value.instrutor ?? '').trim()) return 'Selecione o instrutor responsável.'
   return ''
 }
 
@@ -87,6 +94,7 @@ function onSave() {
     horario: form.value.horario,
     vagas,
     inscritos: prev?.inscritos ?? 0,
+    instrutor: form.value.instrutor.trim(),
   }
 
   if (idx >= 0) mod.slots[idx] = payload
@@ -154,6 +162,7 @@ function onDelete(modalidade, slot) {
               <tr>
                 <th class="px-4 py-3">Dia</th>
                 <th class="px-4 py-3">Horário</th>
+                <th class="px-4 py-3">Instrutor</th>
                 <th class="px-4 py-3">Capacidade</th>
                 <th class="px-4 py-3">Inscritos</th>
                 <th class="px-4 py-3 text-right">Ações</th>
@@ -163,6 +172,7 @@ function onDelete(modalidade, slot) {
               <tr v-for="s in m.slots" :key="s.id">
                 <td class="px-4 py-3 font-semibold text-slate-900">{{ s.dia }}</td>
                 <td class="px-4 py-3 text-slate-700">{{ s.horario }}</td>
+                <td class="px-4 py-3 text-slate-700">{{ s.instrutor || 'A definir' }}</td>
                 <td class="px-4 py-3 text-slate-700">{{ s.vagas }}</td>
                 <td class="px-4 py-3 text-slate-700">{{ s.inscritos }}</td>
                 <td class="px-4 py-3">
@@ -185,7 +195,7 @@ function onDelete(modalidade, slot) {
                 </td>
               </tr>
               <tr v-if="m.slots.length === 0">
-                <td class="px-4 py-6 text-sm text-slate-700" colspan="5">Sem aulas.</td>
+                <td class="px-4 py-6 text-sm text-slate-700" colspan="6">Sem aulas.</td>
               </tr>
             </tbody>
           </table>
@@ -253,6 +263,16 @@ function onDelete(modalidade, slot) {
                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
                   type="time"
                 />
+              </label>
+
+              <label class="block space-y-1 sm:col-span-2">
+                <span class="text-sm font-medium text-slate-800">Instrutor responsável</span>
+                <select
+                  v-model="form.instrutor"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-slate-400 focus:ring-2"
+                >
+                  <option v-for="i in instrutores" :key="i.id" :value="i.nome">{{ i.nome }}</option>
+                </select>
               </label>
 
               <label class="block space-y-1 sm:col-span-2">

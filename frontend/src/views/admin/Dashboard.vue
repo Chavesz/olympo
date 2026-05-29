@@ -1,56 +1,53 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { RouterLink } from 'vue-router'
+import { getAdminMetrics } from '../../services/adminMetrics'
 import { loadUsers } from '../../services/mockDb'
 
-const users = ref(loadUsers())
+const metrics = computed(() => getAdminMetrics())
+const users = computed(() => loadUsers())
 
-const totalAlunos = computed(() => users.value.filter((u) => u.role === 'aluno').length)
-const instrutoresAtivos = computed(
-  () => users.value.filter((u) => u.role === 'instrutor' && u.status === 'ativo').length,
+const maxAlunosUnidade = computed(() =>
+  Math.max(1, ...metrics.value.alunosPorUnidade.map((u) => u.total)),
 )
-const fichasCriadas = computed(() => 18)
 
 const atividadesRecentes = computed(() => [
-  { id: 'a-1', titulo: 'Novo aluno cadastrado', detalhe: 'Jonh Santos', quando: 'hoje' },
-  { id: 'a-2', titulo: 'Frequência registrada', detalhe: 'Felipe Silva', quando: 'ontem' },
-  { id: 'a-3', titulo: 'Ficha atualizada', detalhe: 'Treino A - Hipertrofia', quando: 'ontem' },
+  { id: 'a-1', titulo: 'Usuários no sistema', detalhe: `${users.value.length} cadastros`, quando: 'agora' },
+  { id: 'a-2', titulo: 'Alunos ativos', detalhe: `${metrics.value.alunosAtivos} alunos`, quando: 'hoje' },
+  { id: 'a-3', titulo: 'Fichas de treino', detalhe: `${metrics.value.fichasCriadas} fichas`, quando: 'hoje' },
 ])
 </script>
 
 <template>
   <section class="space-y-6">
     <header class="space-y-1">
-      <h1 class="text-2xl font-bold tracking-tight">Dashboard do Administrador</h1>
-      <p class="text-sm text-slate-700">Métricas e visão geral (dados mockados).</p>
+      <h1 class="text-2xl font-bold tracking-tight">Dashboard do administrador</h1>
+      <p class="text-sm text-slate-700">Visão geral do sistema.</p>
     </header>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <div class="rounded-xl border border-slate-200 bg-white p-4">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total de Alunos</div>
-        <div class="mt-2 text-3xl font-bold text-slate-900">{{ totalAlunos }}</div>
-        <div class="mt-1 text-sm text-slate-700">Cadastrados no sistema</div>
+        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total de alunos</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">{{ metrics.totalAlunos }}</div>
+        <div class="mt-1 text-sm text-slate-700">{{ metrics.alunosAtivos }} ativos</div>
       </div>
 
       <div class="rounded-xl border border-slate-200 bg-white p-4">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Instrutores Ativos</div>
-        <div class="mt-2 text-3xl font-bold text-slate-900">{{ instrutoresAtivos }}</div>
+        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Instrutores ativos</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">{{ metrics.instrutoresAtivos }}</div>
         <div class="mt-1 text-sm text-slate-700">Com acesso ativo</div>
       </div>
 
       <div class="rounded-xl border border-slate-200 bg-white p-4">
-        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fichas Criadas</div>
-        <div class="mt-2 text-3xl font-bold text-slate-900">{{ fichasCriadas }}</div>
-        <div class="mt-1 text-sm text-slate-700">Total no período</div>
+        <div class="text-xs font-semibold uppercase tracking-wide text-slate-500">Fichas criadas</div>
+        <div class="mt-2 text-3xl font-bold text-slate-900">{{ metrics.fichasCriadas }}</div>
+        <div class="mt-1 text-sm text-slate-700">No sistema</div>
       </div>
     </div>
 
     <div class="grid gap-4 lg:grid-cols-2">
       <div class="rounded-xl border border-slate-200 bg-white p-4">
-        <div class="flex items-center justify-between">
-          <div class="text-sm font-semibold text-slate-900">Atividades recentes</div>
-          <div class="text-xs text-slate-500">placeholder</div>
-        </div>
-
+        <div class="text-sm font-semibold text-slate-900">Atividades recentes</div>
         <div class="mt-4 divide-y divide-slate-200">
           <div v-for="a in atividadesRecentes" :key="a.id" class="py-3">
             <div class="flex items-start justify-between gap-3">
@@ -66,16 +63,29 @@ const atividadesRecentes = computed(() => [
 
       <div class="rounded-xl border border-slate-200 bg-white p-4">
         <div class="flex items-center justify-between">
-          <div class="text-sm font-semibold text-slate-900">Gráfico</div>
-          <div class="text-xs text-slate-500">placeholder</div>
+          <div class="text-sm font-semibold text-slate-900">Alunos ativos por unidade</div>
+          <RouterLink class="text-xs font-semibold text-emerald-700 hover:underline" to="/admin/relatorios">
+            Ver relatórios
+          </RouterLink>
         </div>
 
-        <div class="mt-4 grid h-56 place-items-center rounded-lg border border-dashed border-slate-300">
-          <div class="text-center">
-            <div class="text-sm font-semibold text-slate-900">Área reservada</div>
-            <div class="mt-1 text-sm text-slate-700">Aqui entra um gráfico ou relatório.</div>
-          </div>
-        </div>
+        <ul class="mt-4 space-y-3">
+          <li v-for="u in metrics.alunosPorUnidade" :key="u.unidadeId">
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium text-slate-800">{{ u.nome }}</span>
+              <span class="font-semibold text-slate-900">{{ u.total }}</span>
+            </div>
+            <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+              <div
+                class="h-full rounded-full bg-emerald-500 transition-all"
+                :style="{ width: `${Math.max(8, (u.total / maxAlunosUnidade) * 100)}%` }"
+              />
+            </div>
+          </li>
+          <li v-if="metrics.alunosPorUnidade.length === 0" class="text-sm text-slate-600">
+            Cadastre unidades em Admin → Unidades.
+          </li>
+        </ul>
       </div>
     </div>
   </section>

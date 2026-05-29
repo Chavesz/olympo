@@ -1,11 +1,10 @@
 <script setup>
 import { computed } from 'vue'
-import { getEmail, getUserId } from '../../services/auth'
+import { getEmail } from '../../services/auth'
 import { loadAlunos, loadFichas } from '../../services/mockDb'
 import { loadComunicados, loadEventos } from '../../services/mockPortal'
 
 const email = computed(() => getEmail())
-const userId = computed(() => getUserId())
 
 const aluno = computed(() => {
   const normalizedEmail = String(email.value ?? '').toLowerCase()
@@ -29,7 +28,6 @@ const totalEventos = computed(() => loadEventos().length)
     <header class="space-y-1">
       <h1 class="text-2xl font-bold tracking-tight">Bem-vindo, {{ nome.split(' ')[0] }}.</h1>
       <p class="text-sm text-slate-700">Visão geral rápida do seu painel.</p>
-      <div v-if="userId" class="text-xs text-slate-500">ID: {{ userId }}</div>
     </header>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
